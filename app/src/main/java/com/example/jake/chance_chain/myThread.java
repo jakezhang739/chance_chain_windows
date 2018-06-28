@@ -35,7 +35,7 @@ public class myThread extends Thread {
         TotalChanceDO totalChanceDO = dynamoDBMapper.load(TotalChanceDO.class,"totalID");
         Log.d("dyna",""+totalChanceDO.getTotC());
 
-        for(int i = 1;i<=Integer.parseInt(totalChanceDO.getTotC());i++){
+        for(int i = Integer.parseInt(totalChanceDO.getTotC());i>=1;i--){
             ChanceWithValueDO chanceWithValueDO = dynamoDBMapper.load(ChanceWithValueDO.class,String.valueOf(i));
             mDatasImage.add("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/"+String.valueOf(i)+".png");
             mDatasText.add(chanceWithValueDO.getValue());
