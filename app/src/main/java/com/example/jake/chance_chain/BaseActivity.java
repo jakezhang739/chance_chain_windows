@@ -94,6 +94,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         mDatasImage = new ArrayList<String>(Arrays.asList());
         mDatasText = new ArrayList<String>(Arrays.asList());
         touUri = new ArrayList<String>(Arrays.asList());
+        navigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        navigationView.setOnNavigationItemSelectedListener(this);
+        navigationView.setItemIconTintList(null);
+
         myThread mThread = new myThread(this,context,dynamoDBMapper,mRecyclerView,mAdapter,mDatasText,mDatasImage,touUri);
         mThread.start();
 
@@ -101,6 +105,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
 
         Log.d("uid","f"+uId);
+
         Log.d("number","f"+number);
 
 
@@ -112,7 +117,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                 @Override
                 public void onClick(View v) {
                     IdentityManager.getDefaultIdentityManager().signOut();
-                    Intent intent = new Intent(BaseActivity.this, AuthenticatorActivity.class);
+                    Intent intent = new Intent(BaseActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
             });
@@ -142,6 +147,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
 
         }
+
 
         else if(getContentViewId()==R.layout.activity_notification){
             Button picButton = (Button) findViewById(R.id.picBtn);
@@ -206,8 +212,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         }
 
 
-        navigationView = (BottomNavigationView) findViewById(R.id.navigation);
-        navigationView.setOnNavigationItemSelectedListener(this);
+
     }
 
     public int getNum(int num){

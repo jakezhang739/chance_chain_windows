@@ -19,6 +19,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
@@ -36,6 +37,8 @@ import static com.amazonaws.regions.Regions.US_EAST_1;
 public class AppHelper {
     private static final String TAG = "AppHelper";
 
+    public static final String fbId = "1007699982736676";
+
     private static AppHelper appHelper;
     private static CognitoUserPool userPool;
     private static CognitoUser user;
@@ -51,6 +54,8 @@ public class AppHelper {
 
     private static final Regions cognitoRegion = US_EAST_1;
     public static final String BUCKET_REGION = "us-east-1";
+    private static CognitoUserSession currSession;
+    private static CognitoUserDetails userDetails;
     public int number=0;
 
 
