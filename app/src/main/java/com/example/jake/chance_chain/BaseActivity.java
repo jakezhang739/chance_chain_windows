@@ -16,6 +16,7 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +29,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
+import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.header.BezierRadarHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.squareup.picasso.Picasso;
 
 
@@ -193,6 +200,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             //得到控件
             //Intent intent = new Intent(BaseActivity.this,Load.class);
             //startActivity(intent);
+            RefreshLayout refreshLayout = (RefreshLayout) findViewById(R.id.refreshLayout);
+            refreshLayout.setRefreshHeader(new BezierRadarHeader(this).setEnableHorizontalDrag(true));
+            refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
             while(trynum=="ui"){
                 Log.d("yoyouuu",""+trynum);
             }
@@ -207,6 +217,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             //设置适配器
             mAdapter = new GalleryAdapter(this, mDatasImage,mDatasText,touUri);
             mRecyclerView.setAdapter(mAdapter);
+            refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+                @Override
+                public void onRefresh(RefreshLayout refreshlayout) {
+                    refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+                }
+            });
 
 
         }
