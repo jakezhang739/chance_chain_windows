@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/messageBack"
+    tools:context=".chattingActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/tianc"
+        android:id="@+id/liaozhuti"></ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/tianc"
+        android:layout_above="@+id/liaotian"
+        android:layout_alignParentStart="true"
+        android:background="@color/tiancong" />
+
+    <RelativeLayout
+        android:id="@+id/liaotian"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/liaotian">
+
+        <EditText
+            android:id="@+id/inputMsg"
+            android:layout_width="265dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/msginput"
+            android:inputType="textMultiLine" />
+
+        <ImageView
+            android:id="@+id/fasongxiao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/inputMsg"
+            android:clickable="true"
+            android:layout_marginRight="5dp"
+            app:srcCompat="@drawable/zhaopian" />
+
+        <ImageView
+            android:id="@+id/fangzhaopian"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/inputMsg"
+            android:clickable="true"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@drawable/fabu" />
+    </RelativeLayout>
+
+</RelativeLayout>

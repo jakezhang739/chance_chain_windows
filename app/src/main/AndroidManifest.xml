@@ -20,7 +20,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".HomeActivity"
-            android:label="@string/title_activity_home" />
+            android:icon="@drawable/name3x"
+            android:label=""
+            android:logo="@drawable/name3x" />
         <activity
             android:name=".NotificationActivity"
             android:label="@string/title_activity_notification" />
@@ -32,7 +34,7 @@
             android:label="@string/title_activity_information">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MyActivity" />
+                android:value=".settingActivity" />
         </activity>
         <activity
             android:name=".changeInformationActivity"
@@ -41,14 +43,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".InformationActivity" />
         </activity>
-
         <activity android:name=".getPicActivity" />
 
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true" />
 
-        <activity android:name=".Load" />
         <activity
             android:name=".splashActivity"
             android:theme="@style/AppTheme.Launcher">
@@ -61,7 +61,6 @@
         <activity
             android:name=".LoginActivity"
             android:label="登录机会链" />
-
         <activity
             android:name=".signUpActivity"
             android:label="注册">
@@ -69,7 +68,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
-
         <activity
             android:name=".forgotPassword"
             android:label="忘记密码">
@@ -77,7 +75,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginActivity" />
         </activity>
-
         <activity
             android:name=".confirmUser"
             android:label="确认用户">
@@ -85,8 +82,39 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".signUpActivity" />
         </activity>
-
-
+        <activity
+            android:name=".ContentActivity"
+            android:label="机会">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+        </activity>
+        <activity android:name=".sharingActivity" />
+        <activity
+            android:name=".fsizepic"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".settingActivity"
+            android:label="设置">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MyActivity" />
+        </activity>
+        <activity
+            android:name=".MessageActivity"
+            android:label="我的消息">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MyActivity" />
+        </activity>
+        <activity
+            android:name=".HisActivity"
+            android:label="他的主页">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".HomeActivity" />
+        </activity>
+        <activity android:name=".chattingActivity"></activity>
     </application>
 
 </manifest>

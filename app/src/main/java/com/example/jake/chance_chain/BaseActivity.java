@@ -1,6 +1,13 @@
 package com.example.jake.chance_chain;
 
 import android.Manifest;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,24 +23,39 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
+import android.util.ArraySet;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sangcomz.fishbun.FishBun;
+import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter;
+import com.sangcomz.fishbun.define.Define;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.header.BezierRadarHeader;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.squareup.picasso.Picasso;
 
@@ -58,7 +80,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
+
+
 
 public abstract class BaseActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     DynamoDBMapper dynamoDBMapper;
@@ -73,7 +103,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     private String uId;
     int number=0;
     ImageView myimageView,tImage;
-    TextView myTextView;
+    TextView myTextView,jianText,shenText,guanText,beiGuanText,faText;
     String ChanceId="asd";
     String totId="totalID";
     String vStr;
@@ -81,10 +111,19 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     private GalleryAdapter mAdapter;
     private List<String> mDatasText;
     private List<String> mDatasImage;
+    private String username,textTilte,textValue,txtBonus,txtBonusType,txtReward,txtRewardType;
+    private List<String> picList;
     String TestChance;
     String shiit;
     public String trynum = "ui";
     public List<String> touUri;
+    private List<String> uid;
+    private List<Uri> uriList;
+    private HomeFragment fragment = new HomeFragment();
+    private FragmentTransaction fragmentTransaction;
+    private int clickFlag =0;
+    private int rewardtypeInt,bonusTypeInt;
+
 
 
 
@@ -103,52 +142,47 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         touUri = new ArrayList<String>(Arrays.asList());
         navigationView = (BottomNavigationView) findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(this);
+
         navigationView.setItemIconTintList(null);
 
-        myThread mThread = new myThread(this,context,dynamoDBMapper,mRecyclerView,mAdapter,mDatasText,mDatasImage,touUri);
-        mThread.start();
+        uriList = new ArrayList<Uri>();
+        username=helper.getCurrentUserName(context);
+
+
 
 
 
 
         Log.d("uid","f"+uId);
 
-        Log.d("number","f"+number);
 
 
         if(getContentViewId()==R.layout.activity_my) {
-            tImage = (ImageView) findViewById(R.id.touImage);
-            Button clickButton = (Button) findViewById(R.id.logoutBtn);
-            Button infButton = (Button) findViewById(R.id.informationBtn);
-            clickButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    IdentityManager.getDefaultIdentityManager().signOut();
-                    Intent intent = new Intent(BaseActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }
-            });
+
+            tImage = (ImageView) findViewById(R.id.wodetouxiang);
+            RelativeLayout infButton = (RelativeLayout) findViewById(R.id.shezhi);
 
             infButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    Intent intentInf = new Intent(BaseActivity.this, InformationActivity.class);
+                    Intent intentInf = new Intent(BaseActivity.this, settingActivity.class);
                     startActivity(intentInf);
                 }
             });
+            IdentityManager.getDefaultIdentityManager().signOut();
 
-            TextView userTxt = (TextView) findViewById(R.id.userName);
+            TextView userTxt = (TextView) findViewById(R.id.wodeUser);
             userTxt.setText(AppHelper.getCurrentUserName(context));
             us = AppHelper.getCurrentUserName(context);
+            jianText = (TextView) findViewById(R.id.wodeJian);
+            shenText = (TextView) findViewById(R.id.woshengwang);
+            guanText = (TextView) findViewById(R.id.guanzhuNum);
+            beiGuanText = (TextView) findViewById(R.id.beiGuanNum);
+            faText = (TextView) findViewById(R.id.woFabuNum);
+            new Thread(setUpMy).start();
             Log.d("username","www"+us);
-            try{
-                Picasso.get().load("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/"+us+".png").resize(60,60).centerCrop().into(tImage);
 
-            }
-            catch (Exception e){
-
-            }
 
 
 
@@ -157,72 +191,216 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
 
         else if(getContentViewId()==R.layout.activity_notification){
-            Button picButton = (Button) findViewById(R.id.picBtn);
-            Button pubButton = (Button) findViewById(R.id.publicBtn);
-            EditText vText = (EditText) findViewById(R.id.neirong);
+            ImageView picView = (ImageView) findViewById(R.id.getPic);
+            EditText titleText = (EditText) findViewById(R.id.titletext);
+            EditText Neirong = (EditText) findViewById(R.id.neirong);
+            EditText reWard = (EditText) findViewById(R.id.jiaovalue);
+            EditText bonus = (EditText) findViewById(R.id.zhuivalue);
 
-            picButton.setOnClickListener(new View.OnClickListener(){
+            TextView cic1 = (TextView) findViewById(R.id.circleText1);
+            TextView cic2 = (TextView) findViewById(R.id.circleText2);
+            TextView cic3 = (TextView) findViewById(R.id.circleText3);
+            TextView cic4 = (TextView) findViewById(R.id.circleText4);
+
+            Button fabuBtn = (Button) findViewById(R.id.fabubtn);
+
+
+            cic1.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                   cic1.setBackground(ContextCompat.getDrawable(context,R.drawable.yeallow_cic));
+                   cic2.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                   cic3.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                   cic4.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                   cic1.setTextColor(getColor(R.color.black));
+                   cic2.setTextColor(getColor(R.color.white));
+                   cic3.setTextColor(getColor(R.color.white));
+                   cic4.setTextColor(getColor(R.color.white));
+                   clickFlag=1;
+
+                }
+            });
+
+            cic2.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    cic1.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic2.setBackground(ContextCompat.getDrawable(context,R.drawable.yeallow_cic));
+                    cic3.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic4.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic1.setTextColor(getColor(R.color.white));
+                    cic2.setTextColor(getColor(R.color.black));
+                    cic3.setTextColor(getColor(R.color.white));
+                    cic4.setTextColor(getColor(R.color.white));
+                    clickFlag=2;
+
+                }
+            });
+
+            cic3.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    cic1.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic2.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic3.setBackground(ContextCompat.getDrawable(context,R.drawable.yeallow_cic));
+                    cic4.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic1.setTextColor(getColor(R.color.white));
+                    cic2.setTextColor(getColor(R.color.white));
+                    cic3.setTextColor(getColor(R.color.black));
+                    cic4.setTextColor(getColor(R.color.white));
+                    clickFlag=3;
+
+                }
+            });
+
+            cic4.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    cic1.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic2.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic3.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic4.setBackground(ContextCompat.getDrawable(context,R.drawable.yeallow_cic));
+                    cic1.setTextColor(getColor(R.color.white));
+                    cic2.setTextColor(getColor(R.color.white));
+                    cic3.setTextColor(getColor(R.color.white));
+                    cic4.setTextColor(getColor(R.color.black));
+                    clickFlag=4;
+
+                }
+            });
+
+            Date currentTime = Calendar.getInstance().getTime();
+            long yo = currentTime.getTime();
+            String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(yo)).toString();
+
+            Log.d("time ", "tr " + currentTime.toString()+ " sd " + dateString+ " " + (double) currentTime.getTime());
+            Spinner bi1 = (Spinner) findViewById(R.id.bizhong);
+            Spinner bi2 = (Spinner) findViewById(R.id.bizhong2);
+
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                    R.array.currency_name, R.layout.item_select);
+
+            adapter.setDropDownViewResource(R.layout.drop_down_item);
+
+            bi1.setAdapter(adapter);
+            bi2.setAdapter(adapter);
+            bi1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    //选择列表项的操作
+                    parent.getItemAtPosition(position);
+                    rewardtypeInt = position;
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    //未选中时候的操作
+                    rewardtypeInt = 0;
+                }
+            });
+
+            bi2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    //选择列表项的操作
+                    parent.getItemAtPosition(position);
+                    bonusTypeInt=position;
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    //未选中时候的操作
+                    bonusTypeInt=0;
+
+                }
+            });
+
+
+            picView.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    getChanceID();
-                    Log.d("uuiiu",""+ChanceId);
+                    Log.d("typetry"," rew "+ rewardtypeInt+" bonus " + bonusTypeInt);
+
                     requstStoragePermission();
-                    Intent imageIntent = new Intent();
-                    imageIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                    //imageIntent.addCategory(Intent.CATEGORY_OPENABLE);
-                    // imageIntent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                    imageIntent.setType("image/*");
-                    startActivityForResult(imageIntent.createChooser(imageIntent,"选取图片"),GALLERY_REQUEST);
+                    FishBun.with(BaseActivity.this).setImageAdapter(new GlideAdapter()).startAlbum();
                 }
             });
 
-            pubButton.setOnClickListener(new View.OnClickListener(){
+            fabuBtn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    //number=1;
-                    vStr = vText.getText().toString();
-                    setStuff(vStr);
+                    if(bonus.getText().length()!=0) {
+                        txtBonus = bonus.getText().toString();
+                    }
+                    else{
+                        txtBonus="0";
+                    }
+                    switch (bonusTypeInt){
+                        case 0: txtBonusType="cc";break;
+                        case 1: txtBonusType="eth";break;
+                        case 2: txtBonusType="btc";break;
+                    }
+                    if(reWard.getText().length()!=0) {
+                        txtReward = reWard.getText().toString();
+                    }
+                    else{
+                        txtReward="0";
+                    }
+                    switch (rewardtypeInt){
+                        case 0:txtRewardType = "cc";break;
+                        case 1:txtRewardType="eth";break;
+                        case 2:txtRewardType="btc";break;
+                    }
 
-                    Log.d("number2","value"+ChanceId);
+                    if(titleText.length()==0){
+                        Log.d("wtftt"," rew "+ reWard+" bonus " + bonus);
+                        Toast.makeText(context,"请输入标题",Toast.LENGTH_LONG).show();
+                    }
+                    else if(Neirong.length()==0){
+                        Toast.makeText(context,"请输入内容",Toast.LENGTH_LONG).show();
+                    }
+                    else if(clickFlag==0){
+                        Toast.makeText(context,"请选择标签",Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        textTilte = titleText.getText().toString();
+                        textValue = Neirong.getText().toString();
+                        new Thread(uploadRunnable).start();
+                        Toast.makeText(context,"已上传发布",Toast.LENGTH_LONG).show();
+                    }
+
 
                 }
             });
+
+
+
+
 
         }
         else if(getContentViewId() == R.layout.activity_home) {
-            //File file = loadimg();
-            //Log.d("good","e"+bmp.toString());
-            //myTextView=(TextView) findViewById(R.id.dummy);
+            
 
-            //getstuff();
-            //getChanceID();
-            //initDatas();
-            //得到控件
-            //Intent intent = new Intent(BaseActivity.this,Load.class);
-            //startActivity(intent);
-            RefreshLayout refreshLayout = (RefreshLayout) findViewById(R.id.refreshLayout);
-            refreshLayout.setRefreshHeader(new BezierRadarHeader(this).setEnableHorizontalDrag(true));
-            refreshLayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
-            while(trynum=="ui"){
-                Log.d("yoyouuu",""+trynum);
-            }
 
-            Log.d("yoyouuu",""+trynum);
-            Log.d("trynum","nummm"+mDatasImage.size());
-            mRecyclerView = (RecyclerView) findViewById(R.id.id_recyclerview_horizontal);
-            //设置布局管理器
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-            linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            mRecyclerView.setLayoutManager(linearLayoutManager);
-            //设置适配器
-            mAdapter = new GalleryAdapter(this, mDatasImage,mDatasText,touUri);
-            mRecyclerView.setAdapter(mAdapter);
-            refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            Log.d("loading screen ","check if loading screen");
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setCustomView(R.layout.actionbar);
+            ImageView xiaoxi = (ImageView) actionBar.getCustomView().findViewById(R.id.xiaoxi);
+            xiaoxi.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onRefresh(RefreshLayout refreshlayout) {
-                    refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+                public void onClick(View v) {
+                    Intent intent = new Intent(BaseActivity.this,MessageActivity.class);
+                    startActivity(intent);
                 }
             });
+            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            myThread mThread = new myThread(this,dynamoDBMapper,fragmentTransaction,fragment);
+            mThread.start();
 
 
         }
@@ -245,193 +423,122 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     }
 
 
-    private Handler handler = new Handler(){
+
+
+
+    Handler pHandler = new Handler(){
+      @Override
+      public void handleMessage(Message msg) {
+
+          switch (msg.what){
+              case 1:Picasso.get().load(msg.obj.toString()).resize(60,60).centerCrop().into(tImage);break;
+              case 2:jianText.setText(msg.obj.toString());break;
+              case 3:shenText.setText(msg.obj.toString());break;
+              case 4:guanText.setText(msg.obj.toString());break;
+              case 5:beiGuanText.setText(msg.obj.toString());break;
+              case 6:faText.setText(msg.obj.toString());break;
+          }
+      }
+
+    };
+
+
+    Runnable setUpMy = new Runnable() {
         @Override
-        public void handleMessage(Message msg){
-            String str;
-            if(msg.obj!=null){
-                str=msg.obj.toString();
+        public void run() {
+            UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,username);
+            if(userPoolDO.getProfilePic()==null){
+                Message msg =new Message();
+                msg.what=0;
+                pHandler.sendMessage(msg);
+
             }
             else{
-                str=null;
+                Message msg =new Message();
+                msg.what = 1;
+                msg.obj = userPoolDO.getProfilePic();
+                pHandler.sendMessage(msg);
             }
-            int index = msg.what;
-            /*if(index == 1){
-                //myTextView.setText(str);
-                //mDatasText.add(str);
-                shiit = str;
-            }*/
-            if(index == 2){
-                Log.d("chance","value"+String.valueOf(str));
-                String str1 = "https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/"+str+".png";
-                TestChance = str1;
-                //mDatasImage.add(TestChance);
-                Log.d("str22","value"+str1);
-                //Picasso.get().load(str1).into(myimageView);
+            if(userPoolDO.getResume()==null){
+                Message msg =new Message();
+                msg.what = 2;
+                msg.obj = 0;
+                pHandler.sendMessage(msg);
             }
-            else if(index == 3){
-                //num=num-1;
-                ChanceId=str;
-                Log.d("str2332","value"+ChanceId);
+            else{
+                Message msg =new Message();
+                msg.what=2;
+                msg.obj=userPoolDO.getResume();
+                pHandler.sendMessage(msg);
             }
+            if(userPoolDO.getShengWang()==null){
+                Message msg =new Message();
+                msg.what=3;
+                msg.obj="声望：0";
+                pHandler.sendMessage(msg);
+            }
+            else {
+                Message msg =new Message();
+                msg.what=3;
+                String str = "声望： ";
+                str+=userPoolDO.getShengWang();
+                msg.obj=str;
+                pHandler.sendMessage(msg);
+            }
+            if(userPoolDO.getGuanZhu()==null){
+                Message msg =new Message();
+                msg.what=4;
+                msg.obj="0";
+                pHandler.sendMessage(msg);
+            }
+            else {
+                Message msg =new Message();
+                msg.what=4;
+                msg.obj=userPoolDO.getGuanZhu();
+                pHandler.sendMessage(msg);
+            }
+            if(userPoolDO.getBeiGuanZhu()==null){
+                Message msg =new Message();
+                msg.what = 5;
+                msg.obj = "0";
+                pHandler.sendMessage(msg);
+            }
+            else {
+                Message msg =new Message();
+                msg.what=5;
+                msg.obj=userPoolDO.getBeiGuanZhu();
+                pHandler.sendMessage(msg);
+            }
+            if(userPoolDO.getChanceIdList()==null){
+                Message msg =new Message();
+                msg.what=6;
+                msg.obj=0;
+                pHandler.sendMessage(msg);
+            }
+            else {
+                Message msg =new Message();
+                msg.what=6;
+                msg.obj=userPoolDO.getChanceIdList().size();
+                pHandler.sendMessage(msg);
+            }
+
+
         }
     };
 
-    private void initDatas()
-    {
-        getstuff();
-    }
-
-    private void getChanceID(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("uid","f"+uId);
-                UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,uId);
-                TotalChanceDO totalChanceDO = dynamoDBMapper.load(TotalChanceDO.class,"totalID");
-
-
-                if(userPoolDO != null) {
-                    Log.d("wtf", "sdf3" + userPoolDO.toString());
-                    Log.d("wtf", "career" + userPoolDO.getChanceId());
-                    String str = totalChanceDO.getTotC();
-                    Log.d("wtf2", "career" + str);
-                    if(str!=null) {
-                        number = Integer.parseInt(str);
-                        number++;
-                        Log.d("wtf3", "n" + number);
-                        Message msg=Message.obtain();
-                        msg.what=3;
-                        msg.obj=number;
-                        handler.sendMessage(msg);
-
-
-                    }
-                    totalChanceDO.setTotC(String.valueOf(number));
-                    dynamoDBMapper.save(totalChanceDO);
-                    //userPoolDO.setNumofChance(String.valueOf(number));
-                }
-
-            }
-        }).start();
-
-    }
-
-    private void setStuff(String value){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("uid","f"+uId);
-                UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,uId);
-                TotalChanceDO totalChanceDO = dynamoDBMapper.load(TotalChanceDO.class,totId);
-                String totNum = totalChanceDO.getTotC();
-
-
-                if(userPoolDO != null) {
-                    Log.d("wtf", "sdf3" + userPoolDO.toString());
-                    Log.d("wtf", "career" + userPoolDO.getChanceId());
-                    String str = userPoolDO.getNumofChance();
-                    Log.d("wtf2", "career" + str);
-                    if(str!=null) {
-                        number = Integer.parseInt(str);
-                        //number++;
-                        Log.d("wtf3", "n" + str);
-
-                    }
-                }
-                //number++;
-                String chanceID = uId + String.valueOf(number);
-                setChance(value,chanceID,String.valueOf(number),totNum);
-            }
-        }).start();
-
-    }
-
-    private void getstuff(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("uid","f"+uId);
-                UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,uId);
-                Message msgText = Message.obtain();
-                Message msgChance = Message.obtain();
-                msgText.what=1;
-                msgChance.what=2;
-
-
-                if(userPoolDO != null) {
-                    Log.d("wtf", "sdf3" + userPoolDO.toString());
-                    Log.d("wtf", "career" + userPoolDO.getChanceId());
-                    Log.d("wtf55", "career" + userPoolDO.getNumofChance());
-                    Log.d("wtf55", "career" + userPoolDO.getNumofChance());
-                    if(userPoolDO.getNumofChance()!=null) {
-                        number = Integer.parseInt(userPoolDO.getNumofChance());
-
-                    }Log.d("wtf55", "career" + uId+String.valueOf(number));
-                    try {
-                        String chanceid=uId + String.valueOf(number);
-                        UserChanceDO userChanceDO = dynamoDBMapper.load(UserChanceDO.class,chanceid,uId);
-                        if (userChanceDO != null) {
-                            Log.d("tutu", "sdf3" + userChanceDO.toString());
-                            Log.d("ert", "career" + userChanceDO.getChanceid());
-                            Log.d("ertwe", "career" + userChanceDO.getValue());
-                            msgText.obj=userChanceDO.getValue();
-                            msgChance.obj=userChanceDO.getChanceid();
-                            handler.sendMessage(msgText);
-                            handler.sendMessage(msgChance);
-                        }
-                    }
-                    catch (Exception e){
-                        Log.d("erre", "career" + e+uId+String.valueOf(number));
-                    }
-                }
-                //number++;
-            }
-        }).start();
-    }
-
-    public void setChance(String value,String chance,String num,String totNum){
-        final UserChanceDO userC = new UserChanceDO();
-        final ChanceWithValueDO chanceWithValueDO = new ChanceWithValueDO();
-        chanceWithValueDO.setId(totNum);
-        chanceWithValueDO.setUser(helper.getCurrentUserName(context));
-        chanceWithValueDO.setValue(value);
-
-        userC.setNumid(num);
-        userC.setUserid(uId);
-        userC.setValue(value);
-        userC.setChanceid(chance);
-        Log.d("chanceid","cc"+chance);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dynamoDBMapper.save(userC);
-                dynamoDBMapper.save(chanceWithValueDO);
-                // Item saved
-            }
-        }).start();
-    }
-
-
-
-
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d("actrrr", "n" + ChanceId);
-        if (ChanceId == "asd"){
-            ChanceId=helper.getCurrentUserName(context)+"1";
-        }
-        Uri galUri;
-        String path;;
-        if(requestCode == GALLERY_REQUEST){
-            galUri=data.getData();
-            try {
-                path = AppHelper.getPath(galUri,context);
+    Runnable uploadRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int cSize = helper.returnChanceeSize(dynamoDBMapper)+1;
+            final ChanceWithValueDO chanceWithValueDO = new ChanceWithValueDO();
+            List<String> pictureSet = new ArrayList<>();
+            for(int i=0;i<uriList.size();i++){
+                try {
+                String path = AppHelper.getPath(uriList.get(i),context);
                 File file = new File(path);
-                Log.d("yoiii",""+ChanceId);
+                Log.d("uyu",""+ChanceId);
                 observer =
-                        sTransferUtility.upload(helper.BUCKET_NAME,ChanceId+".png",file);
+                        sTransferUtility.upload(helper.BUCKET_NAME,String.valueOf(cSize)+"_"+String.valueOf(i)+".png",file);
                 observer.setTransferListener(new TransferListener() {
                     @Override
                     public void onError(int id, Exception e) {
@@ -449,14 +556,49 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                         Log.d("onState", "onStateChanged: " + id + ", " + newState);
                     }
                 });
+                pictureSet.add("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/"+String.valueOf(cSize)+"_"+String.valueOf(i)+".png");
                 //beginUpload(path);
-                Log.d("gooodshit", "upload"+file.getName());
+                Log.d("gooodshit", "upload "+String.valueOf(cSize)+"_"+String.valueOf(i)+".png");
             } catch (URISyntaxException e) {
-                Toast.makeText(this,
-                        "Unable to get the file from the given URI.  See error log for details",
-                        Toast.LENGTH_LONG).show();
                 Log.d("fck2", "Unable to upload file from the given uri", e);
             }
+            }
+            Log.d("letsee ", " "+txtReward);
+            if(pictureSet.size()!=0) {
+                chanceWithValueDO.setPictures(pictureSet);
+            }
+            chanceWithValueDO.setUsername(username);
+            chanceWithValueDO.setId(String.valueOf(cSize));
+            chanceWithValueDO.setReward(Double.parseDouble(txtReward));
+            chanceWithValueDO.setRewardType(txtRewardType);
+            chanceWithValueDO.setBonus(Double.parseDouble(txtBonus));
+            chanceWithValueDO.setBonusType(txtBonusType);
+            chanceWithValueDO.setTag((double)clickFlag);
+            chanceWithValueDO.setTitle(textTilte);
+            chanceWithValueDO.setText(textValue);
+            Date currentTime = Calendar.getInstance().getTime();
+            String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
+            chanceWithValueDO.setTime(Double.parseDouble(dateString));
+            dynamoDBMapper.save(chanceWithValueDO);
+
+        }
+    };
+
+
+
+
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("actrrr", "n" + ChanceId);
+
+        Log.d("uri","size "+uriList.size());
+        Log.d("get code","reque" + requestCode + " resu " + resultCode);
+
+        if(requestCode == Define.ALBUM_REQUEST_CODE){
+
+            uriList=data.getParcelableArrayListExtra(Define.INTENT_PATH);
+
 
         }
     }
@@ -540,6 +682,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     void selectBottomNavigationBarItem(int itemId) {
         MenuItem item = navigationView.getMenu().findItem(itemId);
         item.setChecked(true);
+
     }
 
     private void requstStoragePermission(){
@@ -573,6 +716,13 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         this.mDatasImage=mDatasImage;
         this.touUri = tImg;
         this.trynum=n;
+    }
+
+    public void setFragment( List<chanceClass> cc,FragmentTransaction ft){
+
+        fragment.setClass(cc);
+        fragmentTransaction.replace(R.id.fragmentHome,fragment);
+        ft.commitAllowingStateLoss();
     }
 
     abstract int getContentViewId();

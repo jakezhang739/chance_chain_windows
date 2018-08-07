@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/homeback"
     tools:context="com.example.jake.chance_chain.HomeActivity"
     >
 
@@ -20,17 +21,27 @@
         />
 
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="75dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/yellow"
+        android:indeterminateTintMode="src_atop"
+        android:visibility="visible" />
 
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
-        android:id="@+id/refreshLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/id_recyclerview_horizontal"
+    <FrameLayout
+        android:id="@+id/fragmentHome"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:scrollbars="none" />
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+        android:layout_above="@id/navigation">
+    </FrameLayout>
+
+
+
+
 </RelativeLayout>
