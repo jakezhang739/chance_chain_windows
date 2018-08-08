@@ -11,7 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/tianc"
-        android:id="@+id/liaozhuti"></ScrollView>
+        android:id="@+id/liaozhuti">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/liaobeijing"
+            android:orientation="vertical">
+        </LinearLayout>
+    </ScrollView>
 
     <TextView
         android:layout_width="match_parent"
@@ -40,7 +47,7 @@
             android:inputType="textMultiLine" />
 
         <ImageView
-            android:id="@+id/fasongxiao"
+            android:id="@+id/fangzhaopian"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -50,7 +57,7 @@
             app:srcCompat="@drawable/zhaopian" />
 
         <ImageView
-            android:id="@+id/fangzhaopian"
+            android:id="@+id/fasongxiao"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentTop="true"

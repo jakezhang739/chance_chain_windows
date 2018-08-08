@@ -140,6 +140,12 @@ public class AppHelper {
 
     }
 
+    public int returnChatSize(DynamoDBMapper mapper){
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+        PaginatedList<ChattingTableDO> result = mapper.scan(ChattingTableDO.class,scanExpression);
+        return result.size();
+    }
+
 
 
     @SuppressLint("NewApi")
