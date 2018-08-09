@@ -133,6 +133,14 @@ public class AppHelper {
         return mapper;
     }
 
+    public static AmazonDynamoDBClient getClient(Context context){
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(context, userPoolId, cognitoRegion);
+        AmazonDynamoDBClient dbclient = new AmazonDynamoDBClient(credentialsProvider);
+        return dbclient;
+    }
+
+
+
     public int returnChanceeSize(DynamoDBMapper mapper){
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
         PaginatedList<ChanceWithValueDO> result = mapper.scan(ChanceWithValueDO.class,scanExpression);

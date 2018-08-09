@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     android:background="@color/messageBack"
     tools:context=".chattingActivity">
+    <ProgressBar
+        android:id="@+id/progressBarchat"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="75dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/yellow"
+        android:indeterminateTintMode="src_atop"
+        android:visibility="visible" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,6 +29,7 @@
             android:layout_height="match_parent"
             android:id="@+id/liaobeijing"
             android:orientation="vertical">
+
         </LinearLayout>
     </ScrollView>
 
@@ -26,7 +39,8 @@
         android:id="@+id/tianc"
         android:layout_above="@+id/liaotian"
         android:layout_alignParentStart="true"
-        android:background="@color/tiancong" />
+        android:background="@color/tiancong"
+        android:visibility="invisible"/>
 
     <RelativeLayout
         android:id="@+id/liaotian"
@@ -34,7 +48,8 @@
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:background="@color/liaotian">
+        android:background="@color/liaotian"
+        android:visibility="invisible">
 
         <EditText
             android:id="@+id/inputMsg"

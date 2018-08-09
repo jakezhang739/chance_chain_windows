@@ -1,5 +1,6 @@
 package com.example.jake.chance_chain;
 
+
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBAttribute;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBHashKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBIndexHashKey;
@@ -14,28 +15,38 @@ import java.util.Set;
 @DynamoDBTable(tableName = "chance-mobilehub-653619147-ChattingTable")
 
 public class ChattingTableDO {
-    private String _chatid;
-    private String _picture;
+    private Double _chatId;
+    private String _pictures;
+    private Boolean _readFlag;
     private String _receiver;
     private String _sender;
+    private String _text;
     private String _time;
 
-    @DynamoDBHashKey(attributeName = "Chatid")
-    @DynamoDBAttribute(attributeName = "Chatid")
-    public String getChatid() {
-        return _chatid;
+    @DynamoDBHashKey(attributeName = "ChatId")
+    @DynamoDBAttribute(attributeName = "ChatId")
+    public Double getChatId() {
+        return _chatId;
     }
 
-    public void setChatid(final String _chatid) {
-        this._chatid = _chatid;
+    public void setChatId(final Double _chatId) {
+        this._chatId = _chatId;
     }
-    @DynamoDBAttribute(attributeName = "Picture")
-    public String getPicture() {
-        return _picture;
+    @DynamoDBAttribute(attributeName = "Pictures")
+    public String getPictures() {
+        return _pictures;
     }
 
-    public void setPicture(final String _picture) {
-        this._picture = _picture;
+    public void setPictures(final String _pictures) {
+        this._pictures = _pictures;
+    }
+    @DynamoDBAttribute(attributeName = "ReadFlag")
+    public Boolean getReadFlag() {
+        return _readFlag;
+    }
+
+    public void setReadFlag(final Boolean _readFlag) {
+        this._readFlag = _readFlag;
     }
     @DynamoDBIndexHashKey(attributeName = "Receiver", globalSecondaryIndexName = "FindReceiver")
     public String getReceiver() {
@@ -52,6 +63,14 @@ public class ChattingTableDO {
 
     public void setSender(final String _sender) {
         this._sender = _sender;
+    }
+    @DynamoDBAttribute(attributeName = "Text")
+    public String getText() {
+        return _text;
+    }
+
+    public void setText(final String _text) {
+        this._text = _text;
     }
     @DynamoDBAttribute(attributeName = "Time")
     public String getTime() {
