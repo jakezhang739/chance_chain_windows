@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.media.Image;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.app.Activity;
@@ -46,6 +47,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.sangcomz.fishbun.FishBun;
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter;
 import com.sangcomz.fishbun.define.Define;
@@ -82,7 +87,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import android.support.v4.app.FragmentActivity;
@@ -123,6 +130,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     private FragmentTransaction fragmentTransaction;
     private int clickFlag =0;
     private int rewardtypeInt,bonusTypeInt;
+    private int unreadnum = 0;
+    //private HashMap<String, Double> mapping = new HashMap<>();
 
 
 
@@ -137,6 +146,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         sTransferUtility = helper.getTransferUtility(context);
         uId = helper.getCurrentUserName(context);
         dynamoDBMapper=AppHelper.getMapper(context);
+        new Thread(getChatting).start();
         mDatasImage = new ArrayList<String>(Arrays.asList());
         mDatasText = new ArrayList<String>(Arrays.asList());
         touUri = new ArrayList<String>(Arrays.asList());
@@ -180,6 +190,16 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             guanText = (TextView) findViewById(R.id.guanzhuNum);
             beiGuanText = (TextView) findViewById(R.id.beiGuanNum);
             faText = (TextView) findViewById(R.id.woFabuNum);
+            ImageView wodeXiaoxi = (ImageView) findViewById(R.id.woXiao);
+            wodeXiaoxi.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(BaseActivity.this,MessageActivity.class);
+                    intent.putExtra("unread",unreadnum);
+//                    intent.putExtra("noteMap",mapping);
+                    startActivity(intent);
+                }
+            });
             new Thread(setUpMy).start();
             Log.d("username","www"+us);
 
@@ -369,6 +389,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                     else {
                         textTilte = titleText.getText().toString();
                         textValue = Neirong.getText().toString();
+                        titleText.setText("");
+                        Neirong.setText("");
+                        reWard.setText("");
+                        bonus.setText("");
                         new Thread(uploadRunnable).start();
                         Toast.makeText(context,"已上传发布",Toast.LENGTH_LONG).show();
                     }
@@ -395,6 +419,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(BaseActivity.this,MessageActivity.class);
+                    intent.putExtra("unread",unreadnum);
+//                    intent.putExtra("noteMap",mapping);
                     startActivity(intent);
                 }
             });
@@ -710,6 +736,24 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                     new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
         }
     }
+
+    Runnable getChatting = new Runnable() {
+        @Override
+        public void run() {
+//            NotificationTableDO receive = new NotificationTableDO();
+//            receive.setReceiver(uId);
+//            Condition condition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS("false"));
+//            DynamoDBQueryExpression recExpression = new DynamoDBQueryExpression().withConsistentRead(false).withHashKeyValues(receive).withRangeKeyCondition("unReadNum",condition);
+//            List<NotificationTableDO> recList = dynamoDBMapper.query(NotificationTableDO.class,recExpression);
+//            unreadnum = recList.size();
+//            for(int i =0;i<recList.size();i++){
+//                mapping.put(uId,recList.get(i).getUnReadNum());
+//                unreadnum+=recList.get(i).getUnReadNum();
+//            }
+//            Log.d("getSize ",String.valueOf(recList.size()));
+
+        }
+    };
 
     public void setTry(List<String> mDatasImage,List<String> mDatasText, List<String> tImg, String n){
         this.mDatasText=mDatasText;

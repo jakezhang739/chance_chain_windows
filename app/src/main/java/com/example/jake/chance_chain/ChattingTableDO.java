@@ -1,6 +1,5 @@
 package com.example.jake.chance_chain;
 
-
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBAttribute;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBHashKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBIndexHashKey;
@@ -17,11 +16,11 @@ import java.util.Set;
 public class ChattingTableDO {
     private Double _chatId;
     private String _pictures;
-    private Boolean _readFlag;
     private String _receiver;
     private String _sender;
     private String _text;
     private String _time;
+    private String _unReadNum;
 
     @DynamoDBHashKey(attributeName = "ChatId")
     @DynamoDBAttribute(attributeName = "ChatId")
@@ -40,15 +39,8 @@ public class ChattingTableDO {
     public void setPictures(final String _pictures) {
         this._pictures = _pictures;
     }
-    @DynamoDBAttribute(attributeName = "ReadFlag")
-    public Boolean getReadFlag() {
-        return _readFlag;
-    }
-
-    public void setReadFlag(final Boolean _readFlag) {
-        this._readFlag = _readFlag;
-    }
     @DynamoDBIndexHashKey(attributeName = "Receiver", globalSecondaryIndexName = "FindReceiver")
+    @DynamoDBIndexRangeKey(attributeName = "Receiver", globalSecondaryIndexName = "FindSender")
     public String getReceiver() {
         return _receiver;
     }
@@ -79,6 +71,14 @@ public class ChattingTableDO {
 
     public void setTime(final String _time) {
         this._time = _time;
+    }
+    @DynamoDBIndexRangeKey(attributeName = "unReadNum", globalSecondaryIndexName = "FindReceiver")
+    public String getUnReadNum() {
+        return _unReadNum;
+    }
+
+    public void setUnReadNum(final String _unReadNum) {
+        this._unReadNum = _unReadNum;
     }
 
 }
