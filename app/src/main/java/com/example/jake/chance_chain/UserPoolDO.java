@@ -7,7 +7,6 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBIndexRan
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBRangeKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,10 +24,11 @@ public class UserPoolDO {
     private String _resume;
     private String _walletAddress;
     private List<String> _beiGuanZhu;
-    private String _candyCurrency;
-    private String _cryptoCurrency;
+    private Double _candyCurrency=0.0;
+    private Double _cryptoCurrency=0.0;
     private List<String> _gottenList;
     private List<String> _guanZhu;
+    private String _myEmail;
     private String _numofChance;
     private String _profilePic;
     private String _shengWang="0";
@@ -65,9 +65,6 @@ public class UserPoolDO {
 
     public void setChanceIdList(final List<String> _chanceIdList) {
         this._chanceIdList = _chanceIdList;
-    }
-    public void addChanceId(final String id){
-        this._chanceIdList.add(id);
     }
     @DynamoDBAttribute(attributeName = "Gender")
     public String getGender() {
@@ -117,23 +114,20 @@ public class UserPoolDO {
     public void setBeiGuanZhu(final List<String> _beiGuanZhu) {
         this._beiGuanZhu = _beiGuanZhu;
     }
-    public void addBeiGuan(final String Beiguan){
-        this._beiGuanZhu.add(Beiguan);
-    }
     @DynamoDBAttribute(attributeName = "candyCurrency")
-    public String getCandyCurrency() {
+    public Double getCandyCurrency() {
         return _candyCurrency;
     }
 
-    public void setCandyCurrency(final String _candyCurrency) {
+    public void setCandyCurrency(final Double _candyCurrency) {
         this._candyCurrency = _candyCurrency;
     }
     @DynamoDBAttribute(attributeName = "cryptoCurrency")
-    public String getCryptoCurrency() {
+    public Double getCryptoCurrency() {
         return _cryptoCurrency;
     }
 
-    public void setCryptoCurrency(final String _cryptoCurrency) {
+    public void setCryptoCurrency(final Double _cryptoCurrency) {
         this._cryptoCurrency = _cryptoCurrency;
     }
     @DynamoDBAttribute(attributeName = "gottenList")
@@ -144,9 +138,6 @@ public class UserPoolDO {
     public void setGottenList(final List<String> _gottenList) {
         this._gottenList = _gottenList;
     }
-    public void addGotten(final String gotten){
-        this._gottenList.add(gotten);
-    }
     @DynamoDBAttribute(attributeName = "guanZhu")
     public List<String> getGuanZhu() {
         return _guanZhu;
@@ -155,8 +146,13 @@ public class UserPoolDO {
     public void setGuanZhu(final List<String> _guanZhu) {
         this._guanZhu = _guanZhu;
     }
-    public void addGuanZhu(final String guan){
-        this._guanZhu.add(guan);
+    @DynamoDBIndexHashKey(attributeName = "myEmail", globalSecondaryIndexName = "GetStuff")
+    public String getMyEmail() {
+        return _myEmail;
+    }
+
+    public void setMyEmail(final String _myEmail) {
+        this._myEmail = _myEmail;
     }
     @DynamoDBAttribute(attributeName = "numofChance")
     public String getNumofChance() {

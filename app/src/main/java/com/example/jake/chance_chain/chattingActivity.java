@@ -56,6 +56,8 @@ public class chattingActivity extends AppCompatActivity {
     RelativeLayout liaotiankuang;
     TextView tianconglan;
     ProgressBar progressBar;
+    Boolean exit = true;
+    ScrollView s;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,13 +79,18 @@ public class chattingActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBarchat);
         liaotiankuang = (RelativeLayout) findViewById(R.id.liaotian);
         tianconglan = (TextView) findViewById(R.id.tianc);
-        new Thread(ReceiverListener).start();
+        Thread receiveThread = new Thread(ReceiverListener);
+        receiveThread.start();
+        s = (ScrollView) findViewById(R.id.liaozhuti);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                exit=false;
                 finish();
+
             }
         });
+
         addText = (ImageView) findViewById(R.id.fasongxiao);
         addText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +112,7 @@ public class chattingActivity extends AppCompatActivity {
                 case 2:progressBar.setVisibility(View.INVISIBLE); liaotiankuang.setVisibility(View.VISIBLE);tianconglan.setVisibility(View.VISIBLE);onAddMyField(msg.obj.toString());break;
                 case 3:progressBar.setVisibility(View.INVISIBLE); liaotiankuang.setVisibility(View.VISIBLE);tianconglan.setVisibility(View.VISIBLE);onAddHisField(msg.obj.toString());break;
                 case 4:progressBar.setVisibility(View.INVISIBLE); liaotiankuang.setVisibility(View.VISIBLE);tianconglan.setVisibility(View.VISIBLE);break;
+                case 5:progressBar.setVisibility(View.INVISIBLE); liaotiankuang.setVisibility(View.VISIBLE);tianconglan.setVisibility(View.VISIBLE);addText.setVisibility(View.VISIBLE);break;
 
             }
         }
@@ -119,6 +127,8 @@ public class chattingActivity extends AppCompatActivity {
         if (!getMsg.isEmpty()) {
             myMsg.setText(getMsg);
             beijing.addView(layout1);
+            s.fullScroll(View.FOCUS_DOWN);
+
         }
 
         Log.d("beijing", String.valueOf(beijing.getChildCount()) + Picasso.get().load("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/" + "sd" + ".png"));
@@ -129,6 +139,7 @@ public class chattingActivity extends AppCompatActivity {
         TextView myMsg = (TextView) layout1.findViewById(R.id.timetag);
             myMsg.setText(displayTime(time));
             beijing.addView(layout1);
+        s.fullScroll(View.FOCUS_DOWN);
 
         Log.d("beijing", String.valueOf(beijing.getChildCount()) + Picasso.get().load("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/" + "sd" + ".png"));
     }
@@ -141,6 +152,7 @@ public class chattingActivity extends AppCompatActivity {
         if (!getMsg.isEmpty()) {
             myMsg.setText(getMsg);
             beijing.addView(layout1);
+            s.fullScroll(View.FOCUS_DOWN);
         }
 
         Log.d("beijing", String.valueOf(beijing.getChildCount()) + Picasso.get().load("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/" + "sd" + ".png"));
@@ -236,7 +248,7 @@ public class chattingActivity extends AppCompatActivity {
                 mapper.save(chattingListDO);
             }
             Message mesg = new Message();
-            mesg.what=4;
+            mesg.what=5;
             addHandler.sendMessage(mesg);
 
         }
@@ -247,13 +259,19 @@ public class chattingActivity extends AppCompatActivity {
         public void run() {
                     int flag=0;
 
-                    int size;
+                    int size=0;
                     ChattingListDO chattingListDO;
                     try{
                         chattingListDO = mapper.load(ChattingListDO.class,myUsr,userId);
                         List<String> chatString = chattingListDO.getChattingText();
                         for (int i = 0; i < chatString.size(); i++) {
                                 if (i == 0) {
+                                    Message msg = new Message();
+                                    msg.what = 1;
+                                    msg.obj = chattingListDO.getChattingTime().get(i);
+                                    addHandler.sendMessage(msg);
+                                }
+                                else if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
                                     Message msg = new Message();
                                     msg.what = 1;
                                     msg.obj = chattingListDO.getChattingTime().get(i);
@@ -276,7 +294,7 @@ public class chattingActivity extends AppCompatActivity {
 
                             }
                             flag=1;
-
+                            size = chatString.size();
 
                     }catch (Exception e){
                         Log.d("exception1",e.toString());
@@ -287,6 +305,12 @@ public class chattingActivity extends AppCompatActivity {
                 int i = 0;
                 while (i < chatString.size()) {
                     if (i == 0) {
+                        Message msg = new Message();
+                        msg.what = 1;
+                        msg.obj = chattingListDO.getChattingTime().get(i);
+                        addHandler.sendMessage(msg);
+                    }
+                    else if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
                         Message msg = new Message();
                         msg.what = 1;
                         msg.obj = chattingListDO.getChattingTime().get(i);
@@ -315,6 +339,7 @@ public class chattingActivity extends AppCompatActivity {
                     }
                     i++;
                 }
+                size = chatString.size();
                 flag=2;
             }catch (Exception e1){
                 Log.d("exception2",e1.toString());
@@ -328,7 +353,7 @@ public class chattingActivity extends AppCompatActivity {
             }
             else {
                         UserChatDO userChatDO = mapper.load(UserChatDO.class,myUsr);
-                        if(userChatDO.getUnRead()!=null){
+                        if(userChatDO.getUnRead().get(userId)!=null){
                             int num = Integer.parseInt(userChatDO.getUnRead().get(userId));
                             userChatDO.getUnRead().put(userId,"0");
                             double tot =  userChatDO.getTotalUnread().intValue()-num;
@@ -336,103 +361,109 @@ public class chattingActivity extends AppCompatActivity {
                             mapper.save(userChatDO);
                         }
             }
-//                    Condition scondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(myUsr));
-//                    Condition rcondition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS(userId));
-//                    DynamoDBQueryExpression sendExpression = new DynamoDBQueryExpression().withIndexName("FindSender").withRangeKeyCondition("Receiver",rcondition).withConsistentRead(false).withHashKeyValues(sender);
-//                    DynamoDBQueryExpression recExpression = new DynamoDBQueryExpression().withIndexName("FindReceiver").withConsistentRead(false).withRangeKeyCondition("Sender",scondition).withHashKeyValues(receiver);
-//                    List<ChattingTableDO> sendList = mapper.query(ChattingTableDO.class,sendExpression);
-//                    List<ChattingTableDO> recList = mapper.query(ChattingTableDO.class,recExpression);
-//                    sendSize = sendList.size();
-//                    recSize = recList.size();
-//                    List<ChattingTableDO> wholeList = new ArrayList<>();
-//                    wholeList.addAll(recList);
-//                    wholeList.addAll(sendList);
-//                    if(wholeList.size()!=0){
-//                    Collections.sort(wholeList, new Comparator<ChattingTableDO>() {
-//                        @Override
-//                        public int compare(ChattingTableDO o1, ChattingTableDO o2) {
-//                            return o1.getChatId() > o2.getChatId() ? 1 : o1.getChatId() == o2.getChatId() ? 0 : -1;
-//                        }
-//                    });
-////                    QueryRequest queryRequest = new QueryRequest().withTableName("ChattingTable").
-//                    Log.d("gooooood",String.valueOf(sendList.size())+String.valueOf(recList.size()));
-//                    for(int i=0;i<wholeList.size();i++){
-//                        Log.d("sendername ",wholeList.get(i).getSender());
-//                        if(wholeList.get(i).getSender().equals(myUsr)){
-//                            Message msg = new Message();
-//                            msg.what=1;
-//                            msg.obj=wholeList.get(i);
-//                            addHandler.sendMessage(msg);
-//                        }
-//                        else {
-//                            Message msg = new Message();
-//                            msg.what=2;
-//                            msg.obj=wholeList.get(i);
-//                            addHandler.sendMessage(msg);
-//                            mapper.save(wholeList.get(i));
-//                        }
-//
-//                    }
-//                    }
-//
-//                    else{
-//                        Message msg = new Message();
-//                        msg.what=4;
-//                        addHandler.sendMessage(msg);
-//                    }
+            s.fullScroll(View.FOCUS_DOWN);
+            while (exit){
 
-//            while (true) {
-//                int sendTemp,recTemp;
-//                try {
-//                    Thread.sleep(1000);
-//                    sendExpression = new DynamoDBQueryExpression().withIndexName("FindSender").withConsistentRead(false).withHashKeyValues(sender);
-//                    recExpression = new DynamoDBQueryExpression().withIndexName("FindReceiver").withConsistentRead(false).withHashKeyValues(receiver);
-//                    List<ChattingTableDO> sendListTemp = mapper.query(ChattingTableDO.class,sendExpression);
-//                    List<ChattingTableDO> recListTemp = mapper.query(ChattingTableDO.class,recExpression);
-//                    sendTemp = sendListTemp.size();
-//                    recTemp = recListTemp.size();
-//                    Log.d("send,sendtemp,rec,rectemp ",String.valueOf(sendSize)+","+String.valueOf(sendTemp)+","+String.valueOf(recSize)+","+String.valueOf(recTemp));
-//                    int total = sendTemp + recTemp;
-//                    if(total>sendSize+recSize) {
-//                        Log.d("send,sendtemp,rec,rectemp11",String.valueOf(sendSize)+","+String.valueOf(sendTemp)+","+String.valueOf(recSize)+","+String.valueOf(recTemp));
-//                        List<ChattingTableDO> wholeListTemp = new ArrayList<>();
-//                        wholeListTemp.addAll(sendListTemp);
-//                        wholeListTemp.addAll(recListTemp);
-//                        Collections.sort(wholeListTemp, new Comparator<ChattingTableDO>() {
-//                            @Override
-//                            public int compare(ChattingTableDO o1, ChattingTableDO o2) {
-//                                return o1.getChatId() > o2.getChatId() ? 1 : o1.getChatId() == o2.getChatId() ? 0 : -1;
-//                            }
-//                        });
-//                        for(int i=sendSize+recSize;i<wholeListTemp.size();i++){
-//                          //  Log.d("sendername ",wholeList.get(i).getSender());
-//                            if(wholeListTemp.get(i).getSender().equals(myUsr)){
-//                                Message msgTemp = new Message();
-//                                msgTemp.what=5;
-//                                msgTemp.obj=wholeListTemp.get(i);
-//                                addHandler.sendMessage(msgTemp);
-//                            }
-//                            else {
-//                                Message msgTemp = new Message();
-//                                msgTemp.what=6;
-//                                msgTemp.obj=wholeListTemp.get(i);
-//                                addHandler.sendMessage(msgTemp);
-//                            }
-//
-//                        }
-//                        sendSize=sendTemp;
-//                        recSize = recTemp;
-//
-//
-//                    }
-//                    else{
-//
-//                    }
-//                } catch (Exception e) {
-//                    Log.d("error ", e.toString());
-//
-//                }
-//            }
+             try{
+                 Log.d("chattingsize",String.valueOf(size));
+                 Thread.sleep(1000);
+                 int tempflag=0;
+                 try{
+                     chattingListDO = mapper.load(ChattingListDO.class,myUsr,userId);
+                     List<String> chatString = chattingListDO.getChattingText();
+                     Log.d("chattingsize11",String.valueOf(chatString.size()));
+                     for (int i = size; i < chatString.size(); i++) {
+                         if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
+                             Message msg = new Message();
+                             msg.what = 1;
+                             msg.obj = chattingListDO.getChattingTime().get(i);
+                             addHandler.sendMessage(msg);
+                         }
+                         Log.d("srlist ",chattingListDO.getSrList().get(i));
+                         Log.d("srlist1 ",String.valueOf(chatString.size()));
+                         if (chattingListDO.getSrList().get(i).equals("user1")) {
+                             Message msg = new Message();
+                             msg.what = 2;
+                             msg.obj = chatString.get(i);
+                             addHandler.sendMessage(msg);
+                         }
+                         if (chattingListDO.getSrList().get(i).equals("user2")) {
+                             Message msg = new Message();
+                             msg.what = 3;
+                             msg.obj = chatString.get(i);
+                             addHandler.sendMessage(msg);
+                         }
+
+                     }
+                     tempflag=1;
+                     size = chatString.size();
+
+                 }catch (Exception e){
+                     Log.d("exception1",e.toString());
+                 }
+                 try {
+                     chattingListDO = mapper.load(ChattingListDO.class, userId, myUsr);
+                     List<String> chatString = chattingListDO.getChattingText();
+                     int i = size;
+                     Log.d("chattingsize11",String.valueOf(chatString.size()));
+                     while (i < chatString.size()) {
+                        if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
+                             Message msg = new Message();
+                             msg.what = 1;
+                             msg.obj = chattingListDO.getChattingTime().get(i);
+                             addHandler.sendMessage(msg);
+                         }
+                         Log.d("sr11list ", chattingListDO.getSrList().get(i));
+                         Log.d("sr2list1 ", String.valueOf(chatString.size()));
+                         if (chattingListDO.getSrList().get(i).equals("user2")) {
+                             Message msg = new Message();
+                             msg.what = 2;
+                             msg.obj = chatString.get(i);
+                             addHandler.sendMessage(msg);
+                         }
+                         if (chattingListDO.getSrList().get(i).equals("user1")) {
+                             Log.d("y2oyowtf ", String.valueOf(i));
+                             Message msg = new Message();
+                             msg.what = 3;
+                             msg.obj = chatString.get(i);
+                             Log.d("y4oyowtf ", String.valueOf(i));
+                             addHandler.sendMessage(msg);
+//                                    userChatDO.removeUnread(myUsr);
+                             Log.d("y3oyowtf ", String.valueOf(i));
+//                                }
+                             Log.d("yoyowtf ", String.valueOf(i));
+                             Log.d("whatisgoingon ", String.valueOf(i));
+                         }
+                         i++;
+                     }
+                     size = chatString.size();
+                     tempflag=2;
+                 }catch (Exception e1){
+                     Log.d("exception2",e1.toString());
+
+                 }
+                 if(tempflag==0){
+                     Message mesg = new Message();
+                     mesg.what=4;
+                     addHandler.sendMessage(mesg);
+
+                 }
+                 else {
+                     UserChatDO userChatDO = mapper.load(UserChatDO.class,myUsr);
+                     if(userChatDO.getUnRead().get(userId)!=null){
+                         int num = Integer.parseInt(userChatDO.getUnRead().get(userId));
+                         userChatDO.getUnRead().put(userId,"0");
+                         double tot =  userChatDO.getTotalUnread().intValue()-num;
+                         userChatDO.setTotalUnread(tot);
+                         mapper.save(userChatDO);
+                     }
+                 }
+
+             }catch (Exception e){
+
+              }
+            }
+
 
         }
     };

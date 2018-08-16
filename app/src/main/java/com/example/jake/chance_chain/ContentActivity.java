@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.amazonaws.http.HttpMethodName;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBQueryExpression;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.PaginatedList;
 import com.squareup.picasso.Picasso;
@@ -229,6 +230,8 @@ public class ContentActivity extends AppCompatActivity {
 
 
 
+
+
     }
 
     public void popupdismiss(View v){
@@ -240,13 +243,29 @@ public class ContentActivity extends AppCompatActivity {
         public void run() {
             ChanceWithValueDO chanceWithValueDO = dynamoDBMapper.load(ChanceWithValueDO.class,chanceC.cId);
             UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,curUsername);
-            chanceWithValueDO.addGetList(curUsername);
-            userPoolDO.addGotten(chanceC.cId);
+            List<String> cGetList,uGetList;
+            if(chanceWithValueDO.getGetList()!=null){
+                cGetList= chanceWithValueDO.getGetList();}
+            else{
+                cGetList = new ArrayList<>();
+                }
+            if(userPoolDO.getGottenList()!=null){
+                uGetList = userPoolDO.getGottenList();
+            }
+            else {
+                uGetList=new ArrayList<>();
+            }
+            cGetList.add(curUsername);
+            uGetList.add(chanceC.cId);
+            chanceWithValueDO.setGetList(cGetList);
+            userPoolDO.setGottenList(uGetList);
+            //userPoolDO.addGotten(chanceC.cId);
             dynamoDBMapper.save(userPoolDO);
             dynamoDBMapper.save(chanceWithValueDO);
 
         }
     };
+
 
 
     private Handler handler = new Handler(){

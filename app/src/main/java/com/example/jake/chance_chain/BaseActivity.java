@@ -95,6 +95,7 @@ import java.util.Set;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 
+import org.w3c.dom.Text;
 
 
 public abstract class BaseActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -106,7 +107,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     private Context context;
     TransferObserver observer;
     private TransferUtility sTransferUtility;
-    AppHelper helper;
+    AppHelper helper= new AppHelper();;
     private String uId;
     int number=0;
     ImageView myimageView,tImage;
@@ -121,7 +122,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     private String username,textTilte,textValue,txtBonus,txtBonusType,txtReward,txtRewardType;
     private List<String> picList;
     String TestChance;
-    String shiit;
     public String trynum = "ui";
     public List<String> touUri;
     private List<String> uid;
@@ -131,7 +131,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     private int clickFlag =0;
     private int rewardtypeInt,bonusTypeInt;
     private int unreadnum = 0;
+    private String unread = "0";
+    private int viewpage;
+    TextView alert1,alert2;
     //private HashMap<String, Double> mapping = new HashMap<>();
+
 
 
 
@@ -142,21 +146,20 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         super.onCreate(savedInstanceState);
         setContentView(getContentViewId());
         context=getApplication().getApplicationContext();
-        helper = new AppHelper();
         sTransferUtility = helper.getTransferUtility(context);
         uId = helper.getCurrentUserName(context);
+        Log.d("like wtf",uId);
         dynamoDBMapper=AppHelper.getMapper(context);
-        new Thread(getChatting).start();
         mDatasImage = new ArrayList<String>(Arrays.asList());
         mDatasText = new ArrayList<String>(Arrays.asList());
         touUri = new ArrayList<String>(Arrays.asList());
         navigationView = (BottomNavigationView) findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(this);
-
         navigationView.setItemIconTintList(null);
 
         uriList = new ArrayList<Uri>();
         username=helper.getCurrentUserName(context);
+
 
 
 
@@ -168,6 +171,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
 
         if(getContentViewId()==R.layout.activity_my) {
+            new Thread(getChatting1).start();
 
             tImage = (ImageView) findViewById(R.id.wodetouxiang);
             RelativeLayout infButton = (RelativeLayout) findViewById(R.id.shezhi);
@@ -180,7 +184,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                     startActivity(intentInf);
                 }
             });
-            IdentityManager.getDefaultIdentityManager().signOut();
 
             TextView userTxt = (TextView) findViewById(R.id.wodeUser);
             userTxt.setText(AppHelper.getCurrentUserName(context));
@@ -190,6 +193,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             guanText = (TextView) findViewById(R.id.guanzhuNum);
             beiGuanText = (TextView) findViewById(R.id.beiGuanNum);
             faText = (TextView) findViewById(R.id.woFabuNum);
+            alert1 = (TextView) findViewById(R.id.alert1);
             ImageView wodeXiaoxi = (ImageView) findViewById(R.id.woXiao);
             wodeXiaoxi.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -200,8 +204,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                     startActivity(intent);
                 }
             });
-            new Thread(setUpMy).start();
             Log.d("username","www"+us);
+            new Thread(setUpMy).start();
 
 
 
@@ -407,14 +411,15 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         }
         else if(getContentViewId() == R.layout.activity_home) {
-            
-
+            new Thread(getChatting2).start();
 
             Log.d("loading screen ","check if loading screen");
             ActionBar actionBar = getSupportActionBar();
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setCustomView(R.layout.actionbar);
             ImageView xiaoxi = (ImageView) actionBar.getCustomView().findViewById(R.id.xiaoxi);
+            alert2 = (TextView) actionBar.getCustomView().findViewById(R.id.alert2);
+
             xiaoxi.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -472,7 +477,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     Runnable setUpMy = new Runnable() {
         @Override
         public void run() {
-            UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,username);
+            Log.d("wtf ","www"+us);
+            UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,us);
             if(userPoolDO.getProfilePic()==null){
                 Message msg =new Message();
                 msg.what=0;
@@ -557,6 +563,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         public void run() {
             int cSize = helper.returnChanceeSize(dynamoDBMapper)+1;
             final ChanceWithValueDO chanceWithValueDO = new ChanceWithValueDO();
+            final UserPoolDO userPoolDO = new UserPoolDO();
             List<String> pictureSet = new ArrayList<>();
             for(int i=0;i<uriList.size();i++){
                 try {
@@ -593,6 +600,15 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             if(pictureSet.size()!=0) {
                 chanceWithValueDO.setPictures(pictureSet);
             }
+            List<String> idList;
+            if(userPoolDO.getChanceIdList()==null){
+                idList=new ArrayList<>();
+            }
+            else{
+                idList = userPoolDO.getChanceIdList();
+            }
+            idList.add(String.valueOf(cSize));
+            userPoolDO.setChanceIdList(idList);
             chanceWithValueDO.setUsername(username);
             chanceWithValueDO.setId(String.valueOf(cSize));
             chanceWithValueDO.setReward(Double.parseDouble(txtReward));
@@ -606,6 +622,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
             chanceWithValueDO.setTime(Double.parseDouble(dateString));
             dynamoDBMapper.save(chanceWithValueDO);
+            dynamoDBMapper.save(userPoolDO);
 
         }
     };
@@ -737,22 +754,61 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         }
     }
 
-    Runnable getChatting = new Runnable() {
+    Runnable getChatting1 = new Runnable() {
         @Override
         public void run() {
-//            NotificationTableDO receive = new NotificationTableDO();
-//            receive.setReceiver(uId);
-//            Condition condition = new Condition().withComparisonOperator(ComparisonOperator.EQ).withAttributeValueList(new AttributeValue().withS("false"));
-//            DynamoDBQueryExpression recExpression = new DynamoDBQueryExpression().withConsistentRead(false).withHashKeyValues(receive).withRangeKeyCondition("unReadNum",condition);
-//            List<NotificationTableDO> recList = dynamoDBMapper.query(NotificationTableDO.class,recExpression);
-//            unreadnum = recList.size();
-//            for(int i =0;i<recList.size();i++){
-//                mapping.put(uId,recList.get(i).getUnReadNum());
-//                unreadnum+=recList.get(i).getUnReadNum();
-//            }
-//            Log.d("getSize ",String.valueOf(recList.size()));
+            try {
+                UserChatDO userChatDO = dynamoDBMapper.load(UserChatDO.class, uId);
+                unreadnum = userChatDO.getTotalUnread().intValue();
+                if(unreadnum!=0){
+                    Message msg = new Message();
+                    msg.obj = unreadnum;
+                    msg.what=1;
+                    chattingHandler.sendMessage(msg);
+                }
+            }catch (Exception e){
+                Log.d("no message",username+e.toString());
+            }
+
 
         }
+    };
+
+    Runnable getChatting2 = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                UserChatDO userChatDO = dynamoDBMapper.load(UserChatDO.class, uId);
+                unreadnum = userChatDO.getTotalUnread().intValue();
+                if(unreadnum!=0){
+                    Message msg = new Message();
+                    msg.obj = unreadnum;
+                    msg.what=2;
+                    chattingHandler.sendMessage(msg);
+                }
+            }catch (Exception e){
+                Log.d("no message",username+e.toString());
+            }
+
+
+        }
+    };
+
+    Handler chattingHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            unread = msg.obj.toString();
+            if (msg.what == 1) {
+                alert1.setVisibility(View.VISIBLE);
+                alert1.setText(unread);
+
+            }
+ else if (msg.what == 2) {
+                alert2.setVisibility(View.VISIBLE);
+                alert2.setText(unread);
+            }
+        }
+
     };
 
     public void setTry(List<String> mDatasImage,List<String> mDatasText, List<String> tImg, String n){
@@ -772,6 +828,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     abstract int getContentViewId();
 
     abstract int getNavigationMenuItemId();
+
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+    }
 
 
 }

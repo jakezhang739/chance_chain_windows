@@ -62,7 +62,8 @@ public class liuyan extends AppCompatActivity {
         backImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent(liuyan.this,MessageActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -106,6 +107,8 @@ public class liuyan extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(liuyan.this,chattingActivity.class);
+                unread.setText("0");
+                unread.setVisibility(View.INVISIBLE);
                 intent.putExtra("title",username);
                 startActivity(intent);
             }
@@ -117,31 +120,15 @@ public class liuyan extends AppCompatActivity {
     Runnable setup = new Runnable() {
         @Override
         public void run() {
-//                ChattingTableDO receiver = new ChattingTableDO();
-//                ChattingTableDO sender = new ChattingTableDO();
-//                sender.setSender(myUsr);
-//                receiver.setReceiver(myUsr);
-//                Condition sCondition = new Condition().withAttributeValueList(new AttributeValue().withS(myUsr)).withComparisonOperator(ComparisonOperator.EQ);
-////                Condition rConditon = new Condition().withAttributeValueList(new AttributeValue().withS(key)).withComparisonOperator(ComparisonOperator.EQ);
-//                DynamoDBQueryExpression sendExpression = new DynamoDBQueryExpression().withIndexName("FindSender").withConsistentRead(false).withHashKeyValues(sender).withRangeKeyCondition("Receiver",sCondition);
-////                DynamoDBQueryExpression recExpression = new DynamoDBQueryExpression().withIndexName("FindReceiver").withConsistentRead(false).withHashKeyValues(receiver).withRangeKeyCondition("Sender",rConditon);
-//                List<ChattingTableDO> sendList = mapper.query(ChattingTableDO.class, sendExpression);
-////                List<ChattingTableDO> recList = mapper.query(ChattingTableDO.class, recExpression);
-//                List<ChattingTableDO> wholeList = new ArrayList<>();
-////                wholeList.addAll(recList);
-//                wholeList.addAll(sendList);
-//                if (wholeList.size() != 0) {
-//                    Collections.sort(wholeList, new Comparator<ChattingTableDO>() {
-//                        @Override
-//                        public int compare(ChattingTableDO o1, ChattingTableDO o2) {
-//                            return o1.getChatId() > o2.getChatId() ? -1 : o1.getChatId() == o2.getChatId() ? 0 : 1;
-//                        }
-//                    });
-//                }
             try{
+                Log.d("heyhey","whattt");
                 UserChatDO userChatDO = mapper.load(UserChatDO.class,myUsr);
                 List<String> chatList = userChatDO.getChattingList();
-                for(int i= chatList.size()-1;i<=0;i--){
+                Log.d("heyhey",chatList.toString());
+                int size = chatList.size()-1;
+                Log.d("he11yhey",String.valueOf(size));
+                for(int i= size;i>=0;i--){
+                    Log.d("hwt",String.valueOf(i));
                     Message msg = new Message();
                     ArrayList<String> setup = new ArrayList<>();
                     setup.add(chatList.get(i));
@@ -157,12 +144,15 @@ public class liuyan extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putStringArrayList("key",setup);
                     msg.setData(bundle);
+                    Log.d("heyhey",chatList.get(i));
                     setupHandle.sendMessage(msg);
                 }
                 }catch (Exception e){
+
                 Message msg = new Message();
                 msg.what=0;
                 setupHandle.sendMessage(msg);
+                Log.d("errr1",e.toString());
 
             }
 
