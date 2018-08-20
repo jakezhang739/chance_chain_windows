@@ -194,13 +194,37 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             beiGuanText = (TextView) findViewById(R.id.beiGuanNum);
             faText = (TextView) findViewById(R.id.woFabuNum);
             alert1 = (TextView) findViewById(R.id.alert1);
+            ImageView wodeFabu = (ImageView) findViewById(R.id.woFabuImg);
+            ImageView wodeQianbao = (ImageView) findViewById(R.id.woQian);
             ImageView wodeXiaoxi = (ImageView) findViewById(R.id.woXiao);
+            ImageView wodejihui1 = (ImageView) findViewById(R.id.woJihui);
+            wodejihui1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(BaseActivity.this, wodejihui.class);
+                    startActivity(intent);
+                }
+            });
+            wodeQianbao.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(BaseActivity.this,myWallet.class);
+                    startActivity(intent);
+                }
+            });
             wodeXiaoxi.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(BaseActivity.this,MessageActivity.class);
                     intent.putExtra("unread",unreadnum);
 //                    intent.putExtra("noteMap",mapping);
+                    startActivity(intent);
+                }
+            });
+            wodeFabu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(BaseActivity.this,fabuActivity.class);
                     startActivity(intent);
                 }
             });
@@ -526,7 +550,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             else {
                 Message msg =new Message();
                 msg.what=4;
-                msg.obj=userPoolDO.getGuanZhu();
+                msg.obj=userPoolDO.getGuanZhu().size();
                 pHandler.sendMessage(msg);
             }
             if(userPoolDO.getBeiGuanZhu()==null){
@@ -538,7 +562,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             else {
                 Message msg =new Message();
                 msg.what=5;
-                msg.obj=userPoolDO.getBeiGuanZhu();
+                msg.obj=userPoolDO.getBeiGuanZhu().size();
                 pHandler.sendMessage(msg);
             }
             if(userPoolDO.getChanceIdList()==null){
@@ -563,7 +587,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         public void run() {
             int cSize = helper.returnChanceeSize(dynamoDBMapper)+1;
             final ChanceWithValueDO chanceWithValueDO = new ChanceWithValueDO();
-            final UserPoolDO userPoolDO = new UserPoolDO();
+            UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,username);
             List<String> pictureSet = new ArrayList<>();
             for(int i=0;i<uriList.size();i++){
                 try {

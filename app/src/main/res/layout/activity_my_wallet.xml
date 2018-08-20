@@ -10,20 +10,24 @@
 
     <ImageView
         android:id="@+id/imageView14"
-        android:layout_width="360dp"
-        android:layout_height="160dp"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="20dp"
         app:srcCompat="@drawable/qianbaobeijing" />
 
     <ImageView
         android:id="@+id/imageView15"
-        android:layout_width="360dp"
-        android:layout_height="160dp"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
         android:layout_below="@id/imageView14"
-        android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
         app:srcCompat="@drawable/qianbaobeijing" />
 
     <TextView
@@ -42,9 +46,8 @@
         android:id="@+id/textView11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="31dp"
+        android:layout_alignStart="@+id/textView14"
         android:layout_marginTop="135dp"
         android:text="管理钱包"
         android:textColor="@color/black"
@@ -58,7 +61,7 @@
         android:textColor="@color/black"
         android:layout_alignBottom="@+id/textView11"
         android:layout_alignStart="@+id/textView9"
-        android:text="TextView" />
+        android:text="CC: 0" />
 
     <TextView
         android:id="@+id/textView13"
@@ -75,8 +78,9 @@
         android:id="@+id/textView14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/textView11"
+        android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/textView15"
+        android:layout_marginEnd="42dp"
         android:text="管理钱包"
         android:textColor="@color/black"
         android:textSize="15sp" />
