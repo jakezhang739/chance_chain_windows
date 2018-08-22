@@ -158,10 +158,10 @@
             android:layout_marginLeft="25dp"
             android:background="@color/yellow">
         <EditText
-                android:id="@+id/jiaovalue"
+                android:id="@+id/fufei"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="输入金额"
+                android:hint="付费金额"
                 android:layout_toLeftOf="@+id/bizhong"
                 android:background="@color/yellow"
                 android:textColorHint="@color/black"
@@ -186,10 +186,10 @@
             android:layout_marginLeft="25dp"
             android:background="@color/yellow">
             <EditText
-                android:id="@+id/zhuivalue"
+                android:id="@+id/shoufei"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="奖励金额"
+                android:hint="收费金额"
                 android:layout_toLeftOf="@+id/bizhong2"
                 android:background="@color/yellow"
                 android:textColorHint="@color/black"
@@ -203,6 +203,22 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true" />
         </RelativeLayout>
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:id="@+id/huoderenshu"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
+            android:layout_below="@+id/seconddip"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:background="@color/yellow"
+            android:hint="可获得该机会的人数"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:inputType="number"
+            />
 
         <Button
             android:layout_width="match_parent"

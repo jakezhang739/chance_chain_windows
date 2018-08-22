@@ -242,8 +242,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             ImageView picView = (ImageView) findViewById(R.id.getPic);
             EditText titleText = (EditText) findViewById(R.id.titletext);
             EditText Neirong = (EditText) findViewById(R.id.neirong);
-            EditText reWard = (EditText) findViewById(R.id.jiaovalue);
-            EditText bonus = (EditText) findViewById(R.id.zhuivalue);
+            EditText shoufei = (EditText) findViewById(R.id.jiaovalue);
+            EditText fufei = (EditText) findViewById(R.id.zhuivalue);
 
             TextView cic1 = (TextView) findViewById(R.id.circleText1);
             TextView cic2 = (TextView) findViewById(R.id.circleText2);
@@ -398,13 +398,18 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                     else{
                         txtReward="0";
                     }
+
                     switch (rewardtypeInt){
                         case 0:txtRewardType = "cc";break;
                         case 1:txtRewardType="eth";break;
                         case 2:txtRewardType="btc";break;
                     }
+                    if(!txtReward.equals("0")&&!txtBonus.equals("0")){
+                        Toast.makeText(context,"不能同时填写收费金额和付费金额",Toast.LENGTH_LONG).show();
 
-                    if(titleText.length()==0){
+                    }
+
+                    else if(titleText.length()==0){
                         Log.d("wtftt"," rew "+ reWard+" bonus " + bonus);
                         Toast.makeText(context,"请输入标题",Toast.LENGTH_LONG).show();
                     }
@@ -422,7 +427,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                         reWard.setText("");
                         bonus.setText("");
                         new Thread(uploadRunnable).start();
-                        Toast.makeText(context,"已上传发布",Toast.LENGTH_LONG).show();
                     }
 
 
@@ -582,72 +586,99 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
         }
     };
 
+    Handler uploadHandler = new Handler(){
+      @Override
+      public void handleMessage(Message msg){
+          switch (msg.what){
+              case 1:Toast.makeText(context,"已上传发布",Toast.LENGTH_LONG).show();break;
+              case 2:Toast.makeText(context,"可用金额不足",Toast.LENGTH_LONG).show();break;
+          }
+
+      }
+    };
+
     Runnable uploadRunnable = new Runnable() {
         @Override
         public void run() {
-            int cSize = helper.returnChanceeSize(dynamoDBMapper)+1;
+            int cSize = helper.returnChanceeSize(dynamoDBMapper) + 1;
             final ChanceWithValueDO chanceWithValueDO = new ChanceWithValueDO();
-            UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,username);
-            List<String> pictureSet = new ArrayList<>();
-            for(int i=0;i<uriList.size();i++){
-                try {
-                String path = AppHelper.getPath(uriList.get(i),context);
-                File file = new File(path);
-                Log.d("uyu",""+ChanceId);
-                observer =
-                        sTransferUtility.upload(helper.BUCKET_NAME,String.valueOf(cSize)+"_"+String.valueOf(i)+".png",file);
-                observer.setTransferListener(new TransferListener() {
-                    @Override
-                    public void onError(int id, Exception e) {
-                        Log.e("onError", "Error during upload: " + id, e);
-                    }
+            UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class, username);
+            double fee = Double.parseDouble(txtReward);
+            Log.d("thisshiit",userPoolDO.getAvailableWallet().toString()+username);
+            if (userPoolDO.getAvailableWallet() >= fee) {
+                Log.d("th11isshiit",userPoolDO.getAvailableWallet().toString()+username);
+                userPoolDO.setFrozenwallet(userPoolDO.getFrozenwallet()+fee);
+                userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet()-fee);
+                List<String> pictureSet = new ArrayList<>();
+                for (int i = 0; i < uriList.size(); i++) {
+                    try {
+                        String path = AppHelper.getPath(uriList.get(i), context);
+                        File file = new File(path);
+                        Log.d("uyu", "" + ChanceId);
+                        observer =
+                                sTransferUtility.upload(helper.BUCKET_NAME, String.valueOf(cSize) + "_" + String.valueOf(i) + ".png", file);
+                        observer.setTransferListener(new TransferListener() {
+                            @Override
+                            public void onError(int id, Exception e) {
+                                Log.e("onError", "Error during upload: " + id, e);
+                            }
 
-                    @Override
-                    public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-                        Log.d("onProgress", String.format("onProgressChanged: %d, total: %d, current: %d",
-                                id, bytesTotal, bytesCurrent));
-                    }
+                            @Override
+                            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+                                Log.d("onProgress", String.format("onProgressChanged: %d, total: %d, current: %d",
+                                        id, bytesTotal, bytesCurrent));
+                            }
 
-                    @Override
-                    public void onStateChanged(int id, TransferState newState) {
-                        Log.d("onState", "onStateChanged: " + id + ", " + newState);
+                            @Override
+                            public void onStateChanged(int id, TransferState newState) {
+                                Log.d("onState", "onStateChanged: " + id + ", " + newState);
+                            }
+                        });
+                        pictureSet.add("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/" + String.valueOf(cSize) + "_" + String.valueOf(i) + ".png");
+                        //beginUpload(path);
+                        Log.d("gooodshit", "upload " + String.valueOf(cSize) + "_" + String.valueOf(i) + ".png");
+                    } catch (URISyntaxException e) {
+                        Log.d("fck2", "Unable to upload file from the given uri", e);
                     }
-                });
-                pictureSet.add("https://s3.amazonaws.com/chance-userfiles-mobilehub-653619147/"+String.valueOf(cSize)+"_"+String.valueOf(i)+".png");
-                //beginUpload(path);
-                Log.d("gooodshit", "upload "+String.valueOf(cSize)+"_"+String.valueOf(i)+".png");
-            } catch (URISyntaxException e) {
-                Log.d("fck2", "Unable to upload file from the given uri", e);
-            }
-            }
-            Log.d("letsee ", " "+txtReward);
-            if(pictureSet.size()!=0) {
-                chanceWithValueDO.setPictures(pictureSet);
-            }
-            List<String> idList;
-            if(userPoolDO.getChanceIdList()==null){
-                idList=new ArrayList<>();
-            }
-            else{
-                idList = userPoolDO.getChanceIdList();
-            }
-            idList.add(String.valueOf(cSize));
-            userPoolDO.setChanceIdList(idList);
-            chanceWithValueDO.setUsername(username);
-            chanceWithValueDO.setId(String.valueOf(cSize));
-            chanceWithValueDO.setReward(Double.parseDouble(txtReward));
-            chanceWithValueDO.setRewardType(txtRewardType);
-            chanceWithValueDO.setBonus(Double.parseDouble(txtBonus));
-            chanceWithValueDO.setBonusType(txtBonusType);
-            chanceWithValueDO.setTag((double)clickFlag);
-            chanceWithValueDO.setTitle(textTilte);
-            chanceWithValueDO.setText(textValue);
-            Date currentTime = Calendar.getInstance().getTime();
-            String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
-            chanceWithValueDO.setTime(Double.parseDouble(dateString));
-            dynamoDBMapper.save(chanceWithValueDO);
-            dynamoDBMapper.save(userPoolDO);
+                }
+                Log.d("letsee ", " " + txtReward);
+                if (pictureSet.size() != 0) {
+                    chanceWithValueDO.setPictures(pictureSet);
+                }
+                List<String> idList;
+                if (userPoolDO.getChanceIdList() == null) {
+                    idList = new ArrayList<>();
+                } else {
+                    idList = userPoolDO.getChanceIdList();
+                }
 
+                idList.add(String.valueOf(cSize));
+                //Log.d("iido",userPoolDO.getChanceIdList().toString()+idList.toString());
+                userPoolDO.setChanceIdList(idList);
+                chanceWithValueDO.setUsername(username);
+                chanceWithValueDO.setId(String.valueOf(cSize));
+                chanceWithValueDO.setReward(fee);
+                chanceWithValueDO.setRewardType(txtRewardType);
+                chanceWithValueDO.setBonus(Double.parseDouble(txtBonus));
+                chanceWithValueDO.setBonusType(txtBonusType);
+                chanceWithValueDO.setTag((double) clickFlag);
+                chanceWithValueDO.setTitle(textTilte);
+                chanceWithValueDO.setText(textValue);
+                Date currentTime = Calendar.getInstance().getTime();
+                String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
+                chanceWithValueDO.setTime(Double.parseDouble(dateString));
+                dynamoDBMapper.save(chanceWithValueDO);
+                dynamoDBMapper.save(userPoolDO);
+                Message msg = new Message();
+                msg.what=1;
+                uploadHandler.sendMessage(msg);
+
+            } else {
+                Log.d("tryfuck me fuck", "Unable to upload file from the given uri");
+                Message msg = new Message();
+                msg.what=2;
+                uploadHandler.sendMessage(msg);
+            }
         }
     };
 

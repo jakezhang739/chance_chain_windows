@@ -328,12 +328,31 @@ public class fabuActivity extends AppCompatActivity {
         @Override
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
+            UserPoolDO myUser = mapper.load(UserPoolDO.class,myUsr);
+            UserPoolDO hisUser = mapper.load(UserPoolDO.class,chanceWithValueDO.getGetList().get(0));
+            double value;
+            if(chanceWithValueDO.getBonus()!=0.0){
+                Log.d("bonus",chanceWithValueDO.getBonus().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
+                hisUser.setFrozenwallet(hisUser.getFrozenwallet()-chanceWithValueDO.getBonus());
+                myUser.setCandyCurrency(myUser.getCandyCurrency()+chanceWithValueDO.getBonus());
+                myUser.setAvailableWallet(myUser.getAvailableWallet()+chanceWithValueDO.getBonus());
+
+            }
+            else if(chanceWithValueDO.getReward()!=0.0){
+                Log.d("reward",chanceWithValueDO.getReward().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
+                myUser.setFrozenwallet(myUser.getFrozenwallet()-chanceWithValueDO.getReward());
+                hisUser.setCandyCurrency(hisUser.getCandyCurrency()+chanceWithValueDO.getReward());
+                hisUser.setAvailableWallet(hisUser.getAvailableWallet()+chanceWithValueDO.getReward());
+
+            }
             List<String> temp = new ArrayList<>();
             if(chanceWithValueDO.getConfirmList()!=null){
                 temp=chanceWithValueDO.getConfirmList();
             }
             temp.add(tempName);
             chanceWithValueDO.setConfirmList(temp);
+            mapper.save(myUser);
+            mapper.save(hisUser);
             mapper.save(chanceWithValueDO);
         }
     };
@@ -367,7 +386,7 @@ public class fabuActivity extends AppCompatActivity {
                 setupHandler.sendMessage(msg);
 
             }
-            for(int i=0; i < weiJingxin.size();i++){
+            for(int i=weiJingxin.size()-1; i>=0  ;i--){
                 Message msg = new Message();
                 msg.what = 1;
                 msg.obj = weiJingxin.get(i);
@@ -500,17 +519,17 @@ public class fabuActivity extends AppCompatActivity {
                 cc.addComList(comC);
             }
         }
-        if(chanceWithValueDO.getCompleteList()!=null){
-            cc.setCompleteList(chanceWithValueDO.getCompleteList());
-        }
         if (chanceWithValueDO.getSharedFrom() != null) {
             cc.setSharfrom(chanceWithValueDO.getSharedFrom());
         }
         if(chanceWithValueDO.getCompleteList()!=null){
+            cc.completeList=chanceWithValueDO.getCompleteList();
             yiWanCheng.add(cc);
+            Log.d("1shiit",yiWanCheng.toString());
         }
         else if(chanceWithValueDO.getGetList()!=null){
             jinXingZhong.add(cc);
+            Log.d("2shiit",yiWanCheng.toString());
         }
         else{
             weiJingxin.add(cc);

@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/contentNei"
-            android:text="TextView"
+            android:text=""
             android:textColor="@color/yellow"
             android:textSize="20sp" />
 
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/jiaoyijingTxt"
-            android:text="TextView"
+            android:text=""
             android:textColor="@color/yellow"
             android:textSize="20sp" />
         <LinearLayout
