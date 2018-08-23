@@ -178,6 +178,24 @@
         android:layout_marginTop="2dp"
         android:background="@color/colorPrimaryDark">
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/round_corner">
+
+            <Spinner
+                android:id="@+id/select"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp" />
+        </RelativeLayout>
+
         <Button
             android:id="@+id/button4"
             android:layout_width="70dp"

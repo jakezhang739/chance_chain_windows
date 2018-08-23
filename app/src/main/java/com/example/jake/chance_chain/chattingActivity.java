@@ -362,18 +362,30 @@ public class chattingActivity extends AppCompatActivity {
                         }
             }
             s.fullScroll(ScrollView.FOCUS_DOWN);
-            while (exit){
+            while (exit==true){
+                Log.d("showwhile",exit.toString());
+                int tempflag=0;
              try{
                  Log.d("chattingsize",String.valueOf(size));
-                 Thread.sleep(1000);
-                 int tempflag=0;
-                 try{
-                     chattingListDO = mapper.load(ChattingListDO.class,myUsr,userId);
-                     List<String> chatString = chattingListDO.getChattingText();
-                     Log.d("chattingsize11",String.valueOf(chatString.size()));
-                     for (int i = size; i < chatString.size(); i++) {
-                         if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
-                             Message msg = new Message();
+                 Thread.sleep(500);
+             }catch (Exception e){
+
+             }
+             try{
+                 chattingListDO = mapper.load(ChattingListDO.class,myUsr,userId);
+                 List<String> chatString = chattingListDO.getChattingText();
+                 Log.d("chattingsize11",String.valueOf(chatString.size())+String.valueOf(size));
+                 for (int i = size; i < chatString.size(); i++) {
+                     if(i==0){
+                         Message msg = new Message();
+                         msg.what = 1;
+                         msg.obj = chattingListDO.getChattingTime().get(i);
+                         addHandler.sendMessage(msg);
+                         Log.d("gettime ",displayTime(chattingListDO.getChattingTime().get(i)));
+                         Log.d("gettime1 ", chattingListDO.getChattingTime().get(i));
+                     }
+                     else if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
+                         Message msg = new Message();
                              msg.what = 1;
                              msg.obj = chattingListDO.getChattingTime().get(i);
                              addHandler.sendMessage(msg);
@@ -400,7 +412,7 @@ public class chattingActivity extends AppCompatActivity {
                      size = chatString.size();
 
                  }catch (Exception e){
-                     Log.d("exception1",e.toString());
+                     Log.d("wexception1",e.toString());
                  }
                  try {
                      chattingListDO = mapper.load(ChattingListDO.class, userId, myUsr);
@@ -408,7 +420,15 @@ public class chattingActivity extends AppCompatActivity {
                      int i = size;
                      Log.d("chattingsize11",String.valueOf(chatString.size()));
                      while (i < chatString.size()) {
-                        if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
+                         if(i==0){
+                             Message msg = new Message();
+                             msg.what = 1;
+                             msg.obj = chattingListDO.getChattingTime().get(i);
+                             addHandler.sendMessage(msg);
+                             Log.d("gettime ",displayTime(chattingListDO.getChattingTime().get(i)));
+                             Log.d("gettime1 ", chattingListDO.getChattingTime().get(i));
+                         }
+                        else if(Double.parseDouble(chattingListDO.getChattingTime().get(i)) - Double.parseDouble(chattingListDO.getChattingTime().get(i-1)) >1000){
                              Message msg = new Message();
                              msg.what = 1;
                              msg.obj = chattingListDO.getChattingTime().get(i);
@@ -442,7 +462,7 @@ public class chattingActivity extends AppCompatActivity {
                      size = chatString.size();
                      tempflag=2;
                  }catch (Exception e1){
-                     Log.d("exception2",e1.toString());
+                     Log.d("wexception2",e1.toString());
 
                  }
                  if(tempflag==0){
@@ -462,9 +482,7 @@ public class chattingActivity extends AppCompatActivity {
                      }
                  }
 
-             }catch (Exception e){
 
-              }
             }
 
 

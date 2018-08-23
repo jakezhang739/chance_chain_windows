@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class chanceClass implements Parcelable {
+public class chanceClass implements Parcelable{
 
     public List<String> imageSet;
     public double shoufei,fufei,uploadTime,tag,renshu;
@@ -72,8 +72,8 @@ public class chanceClass implements Parcelable {
         shoufei = in.readDouble();
         fufei = in.readDouble();
         uploadTime = in.readDouble();
-        renshu = in.readDouble();
         tag = in.readDouble();
+        renshu = in.readDouble();
         shared = in.readInt();
         cNumber = in.readInt();
         touUri = in.readString();
@@ -98,9 +98,9 @@ public class chanceClass implements Parcelable {
         dest.writeStringList(imageSet);
         dest.writeDouble(shoufei);
         dest.writeDouble(fufei);
-        dest.writeDouble(renshu);
         dest.writeDouble(uploadTime);
         dest.writeDouble(tag);
+        dest.writeDouble(renshu);
         dest.writeInt(shared);
         dest.writeInt(cNumber);
         dest.writeString(touUri);

@@ -14,12 +14,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
@@ -30,7 +33,9 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class fabuActivity extends AppCompatActivity {
     Context context;
@@ -42,8 +47,9 @@ public class fabuActivity extends AppCompatActivity {
     List<chanceClass> yiWanCheng = new ArrayList<>();
     int flag=1;
     LinearLayout upLayout,taglayout,beijing;
-    String tempName,tempCid;
+    String tempName,tempCid,selectedUser;
     ProgressBar progressBar;
+    Map<String,List<String>> userMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,20 +240,36 @@ public class fabuActivity extends AppCompatActivity {
         dianzhan = (TextView) layout1.findViewById(R.id.dianzhan);
         confirmBtn = (Button) layout1.findViewById(R.id.button4);
         cancelBtn = (Button) layout1.findViewById(R.id.button5);
+        Spinner selUsr = (Spinner) layout1.findViewById(R.id.select);
+        ArrayAdapter<String> adapter =new ArrayAdapter<String>(this,R.layout.item_select,cList.completeList);
+        adapter.setDropDownViewResource(R.layout.drop_down_item);
+        selUsr.setAdapter(adapter);
+        selUsr.setPrompt(cList.completeList.get(0).toString());
         mTxt.setText(cList.txtTitle);
         uidTxt.setText(cList.userid);
         String display = displayTime(String.valueOf((long) cList.uploadTime));
         timeTxt.setText(display);
-        if(!cList.confirmList.isEmpty()){
-            confirmBtn.setVisibility(View.INVISIBLE);
-            cancelBtn.setVisibility(View.INVISIBLE);
-            confTxt.setVisibility(View.VISIBLE);
-        }
-        if(!cList.unConfirmList.isEmpty()){
-            confirmBtn.setVisibility(View.INVISIBLE);
-            cancelBtn.setVisibility(View.INVISIBLE);
-            unconfTxt.setVisibility(View.VISIBLE);
-        }
+        selUsr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedUser = parent.getItemAtPosition(position).toString();
+                if(cList.confirmList.contains(selectedUser)){
+                    confirmBtn.setVisibility(View.INVISIBLE);
+                    cancelBtn.setVisibility(View.INVISIBLE);
+                    confTxt.setVisibility(View.VISIBLE);
+                }
+                else if(cList.unConfirmList.contains(selectedUser)){
+                    confirmBtn.setVisibility(View.INVISIBLE);
+                    cancelBtn.setVisibility(View.INVISIBLE);
+                    unconfTxt.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         switch ((int) cList.tag) {
             case 1:
                 tagView.setImageResource(R.drawable.huodong);
@@ -297,8 +319,8 @@ public class fabuActivity extends AppCompatActivity {
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tempName = cList.completeList.get(0);
                 tempCid = cList.cId;
+                cList.confirmList.add(selectedUser);
                 new Thread(oncConfirm).start();
                 confirmBtn.setVisibility(View.INVISIBLE);
                 cancelBtn.setVisibility(View.INVISIBLE);
@@ -314,8 +336,8 @@ public class fabuActivity extends AppCompatActivity {
 //                beijing.removeView(layout1);
 //                jinXingZhong.remove(i);
 //                weiJingxin.add(cList);
-                tempName = cList.completeList.get(0);
                 tempCid = cList.cId;
+                cList.unConfirmList.add(selectedUser);
                 new Thread(onCancel).start();
                 confirmBtn.setVisibility(View.INVISIBLE);
                 cancelBtn.setVisibility(View.INVISIBLE);
@@ -329,27 +351,29 @@ public class fabuActivity extends AppCompatActivity {
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
             UserPoolDO myUser = mapper.load(UserPoolDO.class,myUsr);
-            UserPoolDO hisUser = mapper.load(UserPoolDO.class,chanceWithValueDO.getGetList().get(0));
+            UserPoolDO hisUser = mapper.load(UserPoolDO.class,selectedUser);
             double value;
-            if(chanceWithValueDO.getBonus()!=0.0){
-                Log.d("bonus",chanceWithValueDO.getBonus().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
-                hisUser.setFrozenwallet(hisUser.getFrozenwallet()-chanceWithValueDO.getBonus());
-                myUser.setCandyCurrency(myUser.getCandyCurrency()+chanceWithValueDO.getBonus());
-                myUser.setAvailableWallet(myUser.getAvailableWallet()+chanceWithValueDO.getBonus());
+            if(chanceWithValueDO.getFuFei()!=0.0){
+                Log.d("fufei",chanceWithValueDO.getFuFei().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
+                myUser.setFrozenwallet(myUser.getFrozenwallet()-chanceWithValueDO.getFuFei());
+                myUser.setCandyCurrency(myUser.getCandyCurrency()-chanceWithValueDO.getFuFei());
+                hisUser.setAvailableWallet(hisUser.getAvailableWallet()+chanceWithValueDO.getFuFei());
+                hisUser.setCandyCurrency(hisUser.getCandyCurrency()+chanceWithValueDO.getFuFei());
 
             }
-            else if(chanceWithValueDO.getReward()!=0.0){
-                Log.d("reward",chanceWithValueDO.getReward().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
-                myUser.setFrozenwallet(myUser.getFrozenwallet()-chanceWithValueDO.getReward());
-                hisUser.setCandyCurrency(hisUser.getCandyCurrency()+chanceWithValueDO.getReward());
-                hisUser.setAvailableWallet(hisUser.getAvailableWallet()+chanceWithValueDO.getReward());
+            else if(chanceWithValueDO.getShouFei()!=0.0){
+                Log.d("shoufei",chanceWithValueDO.getShouFei().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
+                hisUser.setFrozenwallet(hisUser.getFrozenwallet()-chanceWithValueDO.getShouFei());
+                hisUser.setCandyCurrency(hisUser.getCandyCurrency()-chanceWithValueDO.getShouFei());
+                myUser.setCandyCurrency(myUser.getCandyCurrency()+chanceWithValueDO.getShouFei());
+                myUser.setAvailableWallet(myUser.getAvailableWallet()+chanceWithValueDO.getShouFei());
 
             }
             List<String> temp = new ArrayList<>();
             if(chanceWithValueDO.getConfirmList()!=null){
                 temp=chanceWithValueDO.getConfirmList();
             }
-            temp.add(tempName);
+            temp.add(selectedUser);
             chanceWithValueDO.setConfirmList(temp);
             mapper.save(myUser);
             mapper.save(hisUser);
@@ -365,7 +389,7 @@ public class fabuActivity extends AppCompatActivity {
             if(chanceWithValueDO.getUnConfirmList()!=null){
                 temp=chanceWithValueDO.getUnConfirmList();
             }
-            temp.add(tempName);
+            temp.add(selectedUser);
             chanceWithValueDO.setUnConfirmList(temp);
             mapper.save(chanceWithValueDO);
 
@@ -479,7 +503,8 @@ public class fabuActivity extends AppCompatActivity {
 
     public void putStuffin(String i) {
         ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, String.valueOf(i));
-        chanceClass cc = new chanceClass(chanceWithValueDO.getRewardType(), chanceWithValueDO.getUsername(), chanceWithValueDO.getTitle(), chanceWithValueDO.getText(), chanceWithValueDO.getId(), chanceWithValueDO.getBonus(), chanceWithValueDO.getReward(), chanceWithValueDO.getTag(), chanceWithValueDO.getTime());
+
+        chanceClass cc = new chanceClass(chanceWithValueDO.getShouFeiType(), chanceWithValueDO.getFuFeiType(),chanceWithValueDO.getUsername(),chanceWithValueDO.getTitle(),chanceWithValueDO.getText(),chanceWithValueDO.getId(),chanceWithValueDO.getShouFei(),chanceWithValueDO.getFuFei(),chanceWithValueDO.getTag(),chanceWithValueDO.getTime(),chanceWithValueDO.getRenShu());
         UserPoolDO userPoolDO = mapper.load(UserPoolDO.class, cc.userid);
         if(chanceWithValueDO.getConfirmList()!=null){
             cc.confirmList=chanceWithValueDO.getConfirmList();
@@ -524,6 +549,7 @@ public class fabuActivity extends AppCompatActivity {
         }
         if(chanceWithValueDO.getCompleteList()!=null){
             cc.completeList=chanceWithValueDO.getCompleteList();
+            userMap.put(cc.cId,cc.completeList);
             yiWanCheng.add(cc);
             Log.d("1shiit",yiWanCheng.toString());
         }
