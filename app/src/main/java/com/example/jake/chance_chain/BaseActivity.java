@@ -200,13 +200,13 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             ImageView wodeXiaoxi = (ImageView) findViewById(R.id.woXiao);
             ImageView wodejihui1 = (ImageView) findViewById(R.id.woJihui);
             ImageView wodeGuan = (ImageView) findViewById(R.id.woGuan);
-            wodeGuan.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent=new Intent(BaseActivity.this,wodeGuanZHui.class);
-                    startActivity(intent);
-                }
-            });
+//            wodeGuan.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent=new Intent(BaseActivity.this,wodeGuanZHui.class);
+//                    startActivity(intent);
+//                }
+//            });
             wodejihui1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
