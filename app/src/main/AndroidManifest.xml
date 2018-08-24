@@ -26,8 +26,7 @@
         <activity
             android:name=".NotificationActivity"
             android:label="@string/title_activity_notification"
-            android:windowSoftInputMode="adjustPan"
-            />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".MyActivity"
             android:label="@string/title_activity_my" />
@@ -110,13 +109,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".HomeActivity" />
         </activity>
-        <activity android:name=".chattingActivity"
-            android:windowSoftInputMode="adjustResize"
-            />
+        <activity
+            android:name=".chattingActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".liuyan" />
         <activity android:name=".myWallet" />
         <activity android:name=".fabuActivity" />
-        <activity android:name=".wodejihui"></activity>
+        <activity android:name=".wodejihui" />
+        <activity android:name=".wodeGuanZHui"></activity>
     </application>
 
 </manifest>
