@@ -261,10 +261,12 @@ public class ContentActivity extends AppCompatActivity {
         public void run() {
             ChanceWithValueDO chanceWithValueDO = dynamoDBMapper.load(ChanceWithValueDO.class, chanceC.cId);
             UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class, curUsername);
+            Date currentTime = Calendar.getInstance().getTime();
+            String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
             Log.d("getrun",shoufei);
+            Message msg = new Message();
             if (userPoolDO.getAvailableWallet() >= Double.parseDouble(shoufei)) {
                 if(chanceWithValueDO.getRenShu()<1){
-                    Message msg = new Message();
                     msg.what=4;
                     handler.sendMessage(msg);
                 }
@@ -282,6 +284,13 @@ public class ContentActivity extends AppCompatActivity {
                     } else {
                         uGetList = new ArrayList<>();
                     }
+                    if(userPoolDO.getLastGet()==null){
+                        msg.what=6;
+                        userPoolDO.setLastGet(dateString);
+                    }
+                    else{
+                        msg.what=7;
+                    }
                     cGetList.add(curUsername);
                     uGetList.add(chanceC.cId);
                     chanceWithValueDO.setGetList(cGetList);
@@ -291,16 +300,14 @@ public class ContentActivity extends AppCompatActivity {
                     //userPoolDO.addGotten(chanceC.cId);
                     dynamoDBMapper.save(userPoolDO);
                     dynamoDBMapper.save(chanceWithValueDO);
-                    Message msg = new Message();
                     msg.what = 3;
                     handler.sendMessage(msg);
                 }
             }
             else {
                 Log.d("getrun11",shoufei);
-                Message msg1 = new Message();
-                msg1.what=5;
-                handler.sendMessage(msg1);
+                msg.what=5;
+                handler.sendMessage(msg);
 
             }
         }
@@ -335,6 +342,12 @@ public class ContentActivity extends AppCompatActivity {
             else if(msg.what==5){
                 Log.d("handler1",String.valueOf(msg.what));
                 Toast.makeText(getApplicationContext().getApplicationContext(),"可用资产不足获得该机会",Toast.LENGTH_LONG).show();
+
+            }
+            else if(msg.what==6){
+
+            }
+            else if(msg.what==7){
 
             }
 

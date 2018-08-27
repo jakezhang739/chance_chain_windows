@@ -2,6 +2,8 @@ package com.example.jake.chance_chain;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.squareup.picasso.Picasso;
@@ -78,14 +81,48 @@ public class sharingActivity extends AppCompatActivity {
 
     }
 
+    Handler shareHandler = new Handler(){
+      @Override
+      public void handleMessage(Message msg){
+          if(msg.what==1){
+              Toast.makeText(context,"首次转发，奖励Candy100个",Toast.LENGTH_LONG).show();
+
+          }
+          else if(msg.what==2){
+              Toast.makeText(context,"今日首次转发，奖励Candy10个",Toast.LENGTH_LONG).show();
+
+          }
+      }
+    };
+
     Runnable sharingRunnable = new Runnable() {
         @Override
         public void run() {
             int cSize = helper.returnChanceeSize(dynamoDBMapper)+1;
             final ChanceWithValueDO chanceWithValueDO = new ChanceWithValueDO();
             UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,userId);
+            Date currentTime = Calendar.getInstance().getTime();
+            String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
             if(userPoolDO.getProfilePic()!=null){
                 chanceWithValueDO.setProfilePicture(userPoolDO.getProfilePic());
+            }
+            Message msg = new Message();
+            if(userPoolDO.getLastZhuan()==null){
+                userPoolDO.setLastZhuan(dateString);
+                msg.what=1;
+                shareHandler.sendMessage(msg);
+                userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 100);
+                userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 100);
+            }
+            else{
+                if(sameDay(userPoolDO.getLastZhuan())==1){
+                    msg.what=2;
+                    shareHandler.sendMessage(msg);
+                    userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 10);
+                    userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 10);
+                }
+                userPoolDO.setLastZhuan(dateString);
+
             }
             chanceWithValueDO.setUsername(userId);
             chanceWithValueDO.setId(String.valueOf(cSize));
@@ -103,11 +140,20 @@ public class sharingActivity extends AppCompatActivity {
             chanceWithValueDO.setTag(1.0);
             chanceWithValueDO.setText("s");
             chanceWithValueDO.setRenShu(1.0);
-            Date currentTime = Calendar.getInstance().getTime();
-            String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
             chanceWithValueDO.setTime(Double.parseDouble(dateString));
             chanceWithValueDO.setTitle(fengTxt);
             dynamoDBMapper.save(chanceWithValueDO);
+            dynamoDBMapper.save(userPoolDO);
         }
     };
+    private int sameDay(String thatTime){
+        Date currentTime = Calendar.getInstance().getTime();
+        String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
+        String sameday1,sameday2;
+        sameday1=thatTime.substring(0,8);
+        sameday2=dateString.substring(0,8);
+        int dayDif = Integer.parseInt(sameday1)-Integer.parseInt(sameday2);
+        return  dayDif;
+
+    }
 }

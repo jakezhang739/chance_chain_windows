@@ -137,8 +137,8 @@ public class fabuActivity extends AppCompatActivity {
                 case 1:progressBar.setVisibility(View.INVISIBLE);onAddView((chanceClass) msg.obj);break;
                 case 2:progressBar.setVisibility(View.INVISIBLE);break;
                 case 3:beijing.removeAllViews();progressBar.setVisibility(View.VISIBLE);break;
-                case 4:progressBar.setVisibility(View.INVISIBLE);onAddView((chanceClass) msg.obj);break;
-                case 5:progressBar.setVisibility(View.INVISIBLE);onAddJingXing((chanceClass) msg.obj,msg.getData().getInt("index"));break;
+                case 4:progressBar.setVisibility(View.INVISIBLE);onAddJingXing((chanceClass) msg.obj);break;
+                case 5:progressBar.setVisibility(View.INVISIBLE);onAddWanCheng((chanceClass) msg.obj);break;
 
 
             }
@@ -218,7 +218,123 @@ public class fabuActivity extends AppCompatActivity {
 
     }
 
-    public void onAddJingXing(chanceClass cList,int i){
+
+    public void onAddJingXing(chanceClass cList){
+        View layout1 = LayoutInflater.from(this).inflate(R.layout.fabuitem, beijing, false);
+        ImageView uImg,tagView,moreContent;
+        TextView mTxt,uidTxt,timeTxt,dianzhan,fenxiang,pingjia,confTxt,unconfTxt;
+        GridView mGridview;
+        CardView cardView;
+        Button confirmBtn,cancelBtn;
+        mTxt=(TextView) layout1.findViewById(R.id.neirongTxt);
+        uImg=(ImageView) layout1.findViewById(R.id.touxiangImg);
+        uidTxt=(TextView) layout1.findViewById(R.id.userNameText);
+        timeTxt=(TextView) layout1.findViewById(R.id.timeview);
+        tagView=(ImageView) layout1.findViewById(R.id.tagView);
+        mGridview = (GridView) layout1.findViewById(R.id.gallery);
+        moreContent = (ImageView) layout1.findViewById(R.id.gengduo);
+        confTxt = (TextView) layout1.findViewById(R.id.confirmtxt);
+        unconfTxt = (TextView) layout1.findViewById(R.id.unConfirmtxt);
+        cardView = (CardView) layout1.findViewById(R.id.card_view);
+        pingjia = (TextView) layout1.findViewById(R.id.liuyan);
+        fenxiang = (TextView) layout1.findViewById(R.id.fenxiang);
+        dianzhan = (TextView) layout1.findViewById(R.id.dianzhan);
+        confirmBtn = (Button) layout1.findViewById(R.id.button4);
+        cancelBtn = (Button) layout1.findViewById(R.id.button5);
+        confirmBtn.setVisibility(View.INVISIBLE);
+        Spinner selUsr = (Spinner) layout1.findViewById(R.id.select);
+        Log.d("fabuactivityjinxing",cList.gottenId.toString());
+        ArrayAdapter<String> adapter =new ArrayAdapter<String>(this,R.layout.item_select,cList.gottenId);
+        adapter.setDropDownViewResource(R.layout.drop_down_item);
+        selUsr.setAdapter(adapter);
+        //selUsr.setPrompt(cList.completeList.get(0).toString());
+        mTxt.setText(cList.txtTitle);
+        uidTxt.setText(cList.userid);
+        String display = displayTime(String.valueOf((long) cList.uploadTime));
+        timeTxt.setText(display);
+        selUsr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedUser = parent.getItemAtPosition(position).toString();
+                if(cList.unConfirmList.contains(selectedUser)){
+                    Log.d("fabuactivityselect",selectedUser);
+                    cancelBtn.setVisibility(View.INVISIBLE);
+                    unconfTxt.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        switch ((int) cList.tag) {
+            case 1:
+                tagView.setImageResource(R.drawable.huodong);
+                break;
+            case 2:
+                tagView.setImageResource(R.drawable.yuema);
+                break;
+            case 3:
+                tagView.setImageResource(R.drawable.remwu);
+                break;
+            case 4:
+                tagView.setImageResource(R.drawable.qita);
+                break;
+        }
+        pingjia.setText(String.valueOf(cList.cNumber));
+        if (!cList.touUri.isEmpty()) {
+            Picasso.get().load(cList.touUri).placeholder(R.drawable.splash).into(uImg);
+        }
+        if (cList.imageSet.size() != 0) {
+            ImageAdapter imageAdapter = new ImageAdapter(context,cList.imageSet);
+            int adprow = cList.imageSet.size()/4;;
+            if(cList.imageSet.size()%4>0){
+                adprow++;
+            }
+            ViewGroup.LayoutParams params =mGridview.getLayoutParams();
+            params.height=250*adprow;
+            mGridview.setLayoutParams(params);
+            mGridview.setAdapter(imageAdapter);
+        }
+        if (cList.liked.size() != 0) {
+            dianzhan.setText(String.valueOf(cList.liked.size()));
+        }
+        if (cList.shared != 0) {
+            fenxiang.setText(String.valueOf(cList.shared));
+        }
+
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(fabuActivity.this, ContentActivity.class);
+                intent.putExtra("cc", cList);
+                startActivity(intent);
+
+            }
+        });
+        beijing.addView(layout1);
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                beijing.removeView(layout1);
+//                jinXingZhong.remove(i);
+//                weiJingxin.add(cList);
+                tempCid = cList.cId;
+                cList.unConfirmList.add(selectedUser);
+                Log.d("fabuactivityjinxing",selectedUser);
+                new Thread(onCancel).start();
+                confirmBtn.setVisibility(View.INVISIBLE);
+                cancelBtn.setVisibility(View.INVISIBLE);
+                unconfTxt.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+
+
+    public void onAddWanCheng(chanceClass cList){
         View layout1 = LayoutInflater.from(this).inflate(R.layout.fabuitem, beijing, false);
         ImageView uImg,tagView,moreContent;
         TextView mTxt,uidTxt,timeTxt,dianzhan,fenxiang,pingjia,confTxt,unconfTxt;
@@ -243,6 +359,8 @@ public class fabuActivity extends AppCompatActivity {
         Spinner selUsr = (Spinner) layout1.findViewById(R.id.select);
         ArrayAdapter<String> adapter =new ArrayAdapter<String>(this,R.layout.item_select,cList.completeList);
         adapter.setDropDownViewResource(R.layout.drop_down_item);
+        Log.d("fabuactivityywc",cList.completeList.toString());
+
         selUsr.setAdapter(adapter);
         //selUsr.setPrompt(cList.completeList.get(0).toString());
         mTxt.setText(cList.txtTitle);
@@ -321,6 +439,7 @@ public class fabuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 tempCid = cList.cId;
                 cList.confirmList.add(selectedUser);
+                Log.d("fabuactivityywcc",selectedUser);
                 new Thread(oncConfirm).start();
                 confirmBtn.setVisibility(View.INVISIBLE);
                 cancelBtn.setVisibility(View.INVISIBLE);
@@ -338,6 +457,7 @@ public class fabuActivity extends AppCompatActivity {
 //                weiJingxin.add(cList);
                 tempCid = cList.cId;
                 cList.unConfirmList.add(selectedUser);
+                Log.d("fabuactivitqxc",selectedUser);
                 new Thread(onCancel).start();
                 confirmBtn.setVisibility(View.INVISIBLE);
                 cancelBtn.setVisibility(View.INVISIBLE);
@@ -551,13 +671,15 @@ public class fabuActivity extends AppCompatActivity {
             cc.completeList=chanceWithValueDO.getCompleteList();
             userMap.put(cc.cId,cc.completeList);
             yiWanCheng.add(cc);
-            Log.d("1shiit",yiWanCheng.toString());
+            Log.d("fabuactivityyiwan",cc.completeList.toString());
         }
-        else if(chanceWithValueDO.getGetList()!=null){
+        if(chanceWithValueDO.getGetList()!=null){
+            weiJingxin.add(cc);
+            Log.d("fabuactivityjinxing",cc.gottenId.toString());
+
+        }
+        if(chanceWithValueDO.getGetList()==null&&chanceWithValueDO.getCompleteList()==null){
             jinXingZhong.add(cc);
-            Log.d("2shiit",yiWanCheng.toString());
-        }
-        else{
             weiJingxin.add(cc);
         }
         mapper.save(chanceWithValueDO);

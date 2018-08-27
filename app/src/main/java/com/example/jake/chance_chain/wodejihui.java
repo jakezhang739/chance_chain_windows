@@ -278,11 +278,13 @@ public class wodejihui extends AppCompatActivity {
             }
         });
         beijing.addView(layout1);
+        Log.d("wodejihui",cList.userid.toString());
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tempName = cList.userid;
                 tempCid = cList.cId;
+                Log.d("wodejihui",cList.userid.toString());
                 new Thread(oncConfirm).start();
                 jinXingZhong.remove(i);
                 yiWanCheng.add(cList);
@@ -296,6 +298,7 @@ public class wodejihui extends AppCompatActivity {
             public void onClick(View v) {
                 tempName = cList.userid;
                 tempCid = cList.cId;
+                Log.d("wodejihui",cList.userid.toString());
                 new Thread(onCancel).start();
                 confirmBtn.setVisibility(View.INVISIBLE);
                 cancelBtn.setVisibility(View.INVISIBLE);
@@ -308,6 +311,9 @@ public class wodejihui extends AppCompatActivity {
         @Override
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
+            List<String> tempGet = chanceWithValueDO.getGetList();
+            tempGet.remove(tempName);
+            chanceWithValueDO.setGetList(tempGet);
             List<String> temp = new ArrayList<>();
             if(chanceWithValueDO.getCompleteList()!=null){
                 temp=chanceWithValueDO.getCompleteList();
@@ -315,6 +321,7 @@ public class wodejihui extends AppCompatActivity {
             temp.add(tempName);
             chanceWithValueDO.setCompleteList(temp);
             mapper.save(chanceWithValueDO);
+            Log.d("wodejihui",chanceWithValueDO.getCompleteList().toString()+chanceWithValueDO.getGetList().toString());
         }
     };
 
@@ -323,12 +330,16 @@ public class wodejihui extends AppCompatActivity {
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
             List<String> temp = new ArrayList<>();
+            List<String> tempGet = chanceWithValueDO.getGetList();
+            tempGet.remove(tempName);
+            chanceWithValueDO.setGetList(tempGet);
             if(chanceWithValueDO.getUnConfirmList()!=null){
                 temp=chanceWithValueDO.getUnConfirmList();
             }
             temp.add(tempName);
             chanceWithValueDO.setUnConfirmList(temp);
             mapper.save(chanceWithValueDO);
+            Log.d("wodejihui",chanceWithValueDO.getCompleteList().toString()+chanceWithValueDO.getGetList().toString());
 
         }
     };

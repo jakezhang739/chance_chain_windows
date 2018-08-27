@@ -26,14 +26,19 @@ public class UserPoolDO {
     private Double _availableWallet=0.0;
     private List<String> _beiGuanZhu;
     private Double _candyCurrency=0.0;
+    private Double _consecutiveLogin=0.0;
     private Double _cryptoCurrency=0.0;
     private Double _frozenwallet=0.0;
     private List<String> _gottenList;
     private List<String> _guanZhu;
+    private String _lastComfirm;
+    private String _lastFabu;
+    private String _lastGet;
+    private String _lastLogin;
+    private String _lastZhuan;
     private String _myEmail;
-    private String _numofChance;
     private String _profilePic;
-    private String _shengWang="0";
+    private Double _shengWang=0.0;
 
     @DynamoDBHashKey(attributeName = "userId")
     @DynamoDBAttribute(attributeName = "userId")
@@ -132,6 +137,14 @@ public class UserPoolDO {
     public void setCandyCurrency(final Double _candyCurrency) {
         this._candyCurrency = _candyCurrency;
     }
+    @DynamoDBAttribute(attributeName = "consecutiveLogin")
+    public Double getConsecutiveLogin() {
+        return _consecutiveLogin;
+    }
+
+    public void setConsecutiveLogin(final Double _consecutiveLogin) {
+        this._consecutiveLogin = _consecutiveLogin;
+    }
     @DynamoDBAttribute(attributeName = "cryptoCurrency")
     public Double getCryptoCurrency() {
         return _cryptoCurrency;
@@ -164,6 +177,46 @@ public class UserPoolDO {
     public void setGuanZhu(final List<String> _guanZhu) {
         this._guanZhu = _guanZhu;
     }
+    @DynamoDBAttribute(attributeName = "lastComfirm")
+    public String getLastComfirm() {
+        return _lastComfirm;
+    }
+
+    public void setLastComfirm(final String _lastComfirm) {
+        this._lastComfirm = _lastComfirm;
+    }
+    @DynamoDBAttribute(attributeName = "lastFabu")
+    public String getLastFabu() {
+        return _lastFabu;
+    }
+
+    public void setLastFabu(final String _lastFabu) {
+        this._lastFabu = _lastFabu;
+    }
+    @DynamoDBAttribute(attributeName = "lastGet")
+    public String getLastGet() {
+        return _lastGet;
+    }
+
+    public void setLastGet(final String _lastGet) {
+        this._lastGet = _lastGet;
+    }
+    @DynamoDBAttribute(attributeName = "lastLogin")
+    public String getLastLogin() {
+        return _lastLogin;
+    }
+
+    public void setLastLogin(final String _lastLogin) {
+        this._lastLogin = _lastLogin;
+    }
+    @DynamoDBAttribute(attributeName = "lastZhuan")
+    public String getLastZhuan() {
+        return _lastZhuan;
+    }
+
+    public void setLastZhuan(final String _lastZhuan) {
+        this._lastZhuan = _lastZhuan;
+    }
     @DynamoDBIndexHashKey(attributeName = "myEmail", globalSecondaryIndexName = "GetStuff")
     public String getMyEmail() {
         return _myEmail;
@@ -171,14 +224,6 @@ public class UserPoolDO {
 
     public void setMyEmail(final String _myEmail) {
         this._myEmail = _myEmail;
-    }
-    @DynamoDBAttribute(attributeName = "numofChance")
-    public String getNumofChance() {
-        return _numofChance;
-    }
-
-    public void setNumofChance(final String _numofChance) {
-        this._numofChance = _numofChance;
     }
     @DynamoDBAttribute(attributeName = "profilePic")
     public String getProfilePic() {
@@ -189,11 +234,11 @@ public class UserPoolDO {
         this._profilePic = _profilePic;
     }
     @DynamoDBAttribute(attributeName = "shengWang")
-    public String getShengWang() {
+    public Double getShengWang() {
         return _shengWang;
     }
 
-    public void setShengWang(final String _shengWang) {
+    public void setShengWang(final Double _shengWang) {
         this._shengWang = _shengWang;
     }
 

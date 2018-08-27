@@ -622,6 +622,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             switch (msg.what){
                 case 1:Toast.makeText(context,"已上传发布",Toast.LENGTH_LONG).show();break;
                 case 2:Toast.makeText(context,"可用金额不足",Toast.LENGTH_LONG).show();break;
+                case 3:Toast.makeText(context,"首次发布奖励Candy100个",Toast.LENGTH_LONG).show();;break;
+                case 4:Toast.makeText(context,"今日首次发布奖励Candy10个",Toast.LENGTH_LONG).show();;break;
             }
 
         }
@@ -630,6 +632,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     Runnable uploadRunnable = new Runnable() {
         @Override
         public void run() {
+            Message msg = new Message();
             int cSize = helper.returnChanceeSize(dynamoDBMapper) + 1;
             final ChanceWithValueDO chanceWithValueDO = new ChanceWithValueDO();
             UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class, username);
@@ -671,6 +674,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                         Log.d("fck2", "Unable to upload file from the given uri", e);
                     }
                 }
+                Date currentTime = Calendar.getInstance().getTime();
+                String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
                 Log.d("letsee ", " " + txtFuFei);
                 if (pictureSet.size() != 0) {
                     chanceWithValueDO.setPictures(pictureSet);
@@ -678,13 +683,25 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                 List<String> idList;
                 if (userPoolDO.getChanceIdList() == null) {
                     idList = new ArrayList<>();
+                    msg.what=3;
+                    uploadHandler.sendMessage(msg);
+                    userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet()+100);
+                    userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency()+100);
+
                 } else {
                     idList = userPoolDO.getChanceIdList();
+                    if(sameDay(userPoolDO.getLastFabu())>0){
+                        msg.what=4;
+                        uploadHandler.sendMessage(msg);
+                        userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet()+10);
+                        userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency()+10);
+                    }
                 }
 
                 idList.add(String.valueOf(cSize));
                 //Log.d("iido",userPoolDO.getChanceIdList().toString()+idList.toString());
                 userPoolDO.setChanceIdList(idList);
+                userPoolDO.setLastFabu(dateString);
                 chanceWithValueDO.setUsername(username);
                 chanceWithValueDO.setId(String.valueOf(cSize));
                 chanceWithValueDO.setFuFei(fee);
@@ -695,18 +712,14 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                 chanceWithValueDO.setTitle(textTilte);
                 chanceWithValueDO.setText(textValue);
                 chanceWithValueDO.setRenShu(renshu);
-                Date currentTime = Calendar.getInstance().getTime();
-                String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
                 chanceWithValueDO.setTime(Double.parseDouble(dateString));
                 dynamoDBMapper.save(chanceWithValueDO);
                 dynamoDBMapper.save(userPoolDO);
-                Message msg = new Message();
                 msg.what=1;
                 uploadHandler.sendMessage(msg);
 
             } else {
                 Log.d("tryfuck me fuck", "Unable to upload file from the given uri");
-                Message msg = new Message();
                 msg.what=2;
                 uploadHandler.sendMessage(msg);
             }
@@ -879,6 +892,95 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         }
     };
+    Runnable LoginRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Date currentLoginTime = Calendar.getInstance().getTime();
+            String loginTime = DateFormat.format("yyyyMMddHHmmss", new Date(currentLoginTime.getTime())).toString();
+            UserPoolDO userPoolDO = dynamoDBMapper.load(UserPoolDO.class,uId);
+            Message msg = new Message();
+            if(userPoolDO.getLastLogin()==null){
+                userPoolDO.setLastLogin(loginTime);
+                userPoolDO.setCandyCurrency(100.0);
+                userPoolDO.setAvailableWallet(100.0);
+                msg.what=0;
+                loginHandler.sendMessage(msg);
+            }
+            else if(sameDay(userPoolDO.getLastLogin())!=0) {
+                userPoolDO.setLastLogin(loginTime);
+                int cLogin = userPoolDO.getConsecutiveLogin().intValue();
+                if (sameDay(userPoolDO.getLastLogin()) == 1) {
+                    switch (cLogin) {
+                        default:
+                            break;
+                        case 1:
+                            userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 5);
+                            userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 5);
+                            msg.what = 1;
+                            loginHandler.sendMessage(msg);
+                            break;
+                        case 2:
+                            userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 10);
+                            userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 10);
+                            msg.what = 2;
+                            loginHandler.sendMessage(msg);
+                            break;
+                        case 3:
+                            userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 15);
+                            userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 15);
+                            msg.what = 3;
+                            loginHandler.sendMessage(msg);
+                            break;
+                        case 4:
+                            userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 30);
+                            userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 30);
+                            msg.what = 4;
+                            loginHandler.sendMessage(msg);
+                            break;
+                        case 5:
+                            userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 40);
+                            userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 40);
+                            msg.what = 5;
+                            loginHandler.sendMessage(msg);
+                            break;
+                        case 6:
+                            userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() + 50);
+                            userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + 50);
+                            msg.what = 1;
+                            loginHandler.sendMessage(msg);
+                            break;
+                        case 7:
+                            userPoolDO.setShengWang(userPoolDO.getShengWang() + 1);
+                            msg.what = 7;
+                            loginHandler.sendMessage(msg);
+                            break;
+                    }
+                    userPoolDO.setConsecutiveLogin((double) cLogin + 1);
+                }
+            }
+
+            dynamoDBMapper.save(userPoolDO);
+
+        }
+    };
+
+    Handler loginHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            int selector = msg.what;
+            switch (selector){
+                case 0:Toast.makeText(context,"首次登录，奖励机会Candy100个",Toast.LENGTH_LONG).show();break;
+                case 1:Toast.makeText(context,"连续一天登录，奖励机会Candy5个",Toast.LENGTH_LONG).show();break;
+                case 2:Toast.makeText(context,"连续二天登录，奖励机会Candy10个",Toast.LENGTH_LONG).show();break;
+                case 3:Toast.makeText(context,"连续三天登录，奖励机会Candy15个",Toast.LENGTH_LONG).show();break;
+                case 4:Toast.makeText(context,"连续四天登录，奖励机会Candy30个",Toast.LENGTH_LONG).show();break;
+                case 5:Toast.makeText(context,"连续五天登录，奖励机会Candy40个",Toast.LENGTH_LONG).show();break;
+                case 6:Toast.makeText(context,"连续六天登录，奖励机会Candy50个",Toast.LENGTH_LONG).show();break;
+                case 7:Toast.makeText(context,"连续七天登录，奖励声望积分一个",Toast.LENGTH_LONG).show();break;
+            }
+
+        }
+    };
 
     Handler chattingHandler = new Handler(){
         @Override
@@ -987,6 +1089,17 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         }
     };
+
+    private int sameDay(String thatTime){
+        Date currentTime = Calendar.getInstance().getTime();
+        String dateString = DateFormat.format("yyyyMMddHHmmss", new Date(currentTime.getTime())).toString();
+        String sameday1,sameday2;
+        sameday1=thatTime.substring(0,8);
+        sameday2=dateString.substring(0,8);
+        int dayDif = Integer.parseInt(sameday1)-Integer.parseInt(sameday2);
+        return  dayDif;
+
+    }
 
 
 }
