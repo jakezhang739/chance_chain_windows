@@ -244,7 +244,7 @@ public class fabuActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter =new ArrayAdapter<String>(this,R.layout.item_select,cList.completeList);
         adapter.setDropDownViewResource(R.layout.drop_down_item);
         selUsr.setAdapter(adapter);
-        selUsr.setPrompt(cList.completeList.get(0).toString());
+        //selUsr.setPrompt(cList.completeList.get(0).toString());
         mTxt.setText(cList.txtTitle);
         uidTxt.setText(cList.userid);
         String display = displayTime(String.valueOf((long) cList.uploadTime));

@@ -34,6 +34,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.ArraySet;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.AdapterView;
@@ -51,6 +52,7 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBQueryExp
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
+import com.google.gson.JsonObject;
 import com.sangcomz.fishbun.FishBun;
 import com.sangcomz.fishbun.adapter.image.impl.GlideAdapter;
 import com.sangcomz.fishbun.define.Define;
@@ -80,7 +82,14 @@ import com.squareup.picasso.Picasso;
 
 import junit.framework.Test;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -95,7 +104,10 @@ import java.util.Set;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 
+import org.json.JSONObject;
 import org.w3c.dom.Text;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 public abstract class BaseActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -160,6 +172,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         uriList = new ArrayList<Uri>();
         username=helper.getCurrentUserName(context);
+        //new Thread(httpRun).start();
+
+
 
 
 
@@ -200,13 +215,13 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
             ImageView wodeXiaoxi = (ImageView) findViewById(R.id.woXiao);
             ImageView wodejihui1 = (ImageView) findViewById(R.id.woJihui);
             ImageView wodeGuan = (ImageView) findViewById(R.id.woGuan);
-            wodeGuan.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent=new Intent(BaseActivity.this,wodeGuanZHui.class);
-                    startActivity(intent);
-                }
-            });
+//            wodeGuan.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent=new Intent(BaseActivity.this,wodeGuanZHui.class);
+//                    startActivity(intent);
+//                }
+//            });
             wodejihui1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -267,15 +282,15 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
                 @Override
                 public void onClick(View v) {
-                   cic1.setBackground(ContextCompat.getDrawable(context,R.drawable.yeallow_cic));
-                   cic2.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
-                   cic3.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
-                   cic4.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
-                   cic1.setTextColor(getColor(R.color.black));
-                   cic2.setTextColor(getColor(R.color.white));
-                   cic3.setTextColor(getColor(R.color.white));
-                   cic4.setTextColor(getColor(R.color.white));
-                   clickFlag=1;
+                    cic1.setBackground(ContextCompat.getDrawable(context,R.drawable.yeallow_cic));
+                    cic2.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic3.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic4.setBackground(ContextCompat.getDrawable(context,R.drawable.transparent_circle));
+                    cic1.setTextColor(getColor(R.color.black));
+                    cic2.setTextColor(getColor(R.color.white));
+                    cic3.setTextColor(getColor(R.color.white));
+                    cic4.setTextColor(getColor(R.color.white));
+                    clickFlag=1;
 
                 }
             });
@@ -501,18 +516,18 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
 
     Handler pHandler = new Handler(){
-      @Override
-      public void handleMessage(Message msg) {
+        @Override
+        public void handleMessage(Message msg) {
 
-          switch (msg.what){
-              case 1:Picasso.get().load(msg.obj.toString()).resize(60,60).centerCrop().into(tImage);break;
-              case 2:jianText.setText(msg.obj.toString());break;
-              case 3:shenText.setText(msg.obj.toString());break;
-              case 4:guanText.setText(msg.obj.toString());break;
-              case 5:beiGuanText.setText(msg.obj.toString());break;
-              case 6:faText.setText(msg.obj.toString());break;
-          }
-      }
+            switch (msg.what){
+                case 1:Picasso.get().load(msg.obj.toString()).resize(60,60).centerCrop().into(tImage);break;
+                case 2:jianText.setText(msg.obj.toString());break;
+                case 3:shenText.setText(msg.obj.toString());break;
+                case 4:guanText.setText(msg.obj.toString());break;
+                case 5:beiGuanText.setText(msg.obj.toString());break;
+                case 6:faText.setText(msg.obj.toString());break;
+            }
+        }
 
     };
 
@@ -602,14 +617,14 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     };
 
     Handler uploadHandler = new Handler(){
-      @Override
-      public void handleMessage(Message msg){
-          switch (msg.what){
-              case 1:Toast.makeText(context,"已上传发布",Toast.LENGTH_LONG).show();break;
-              case 2:Toast.makeText(context,"可用金额不足",Toast.LENGTH_LONG).show();break;
-          }
+        @Override
+        public void handleMessage(Message msg){
+            switch (msg.what){
+                case 1:Toast.makeText(context,"已上传发布",Toast.LENGTH_LONG).show();break;
+                case 2:Toast.makeText(context,"可用金额不足",Toast.LENGTH_LONG).show();break;
+            }
 
-      }
+        }
     };
 
     Runnable uploadRunnable = new Runnable() {
@@ -874,7 +889,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                 alert1.setText(unread);
 
             }
- else if (msg.what == 2) {
+            else if (msg.what == 2) {
                 alert2.setVisibility(View.VISIBLE);
                 alert2.setText(unread);
             }
@@ -904,6 +919,74 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
     public void onBackPressed(){
         super.onBackPressed();
     }
+
+    Runnable httpRun = new Runnable() {
+        @Override
+        public void run() {
+            try {
+//                String url = "http://192.168.31.244:8000";
+//                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+//                        new Response.Listener<String>() {
+//                            @Override
+//                            public void onResponse(String response) {
+//                                // Display the first 500 characters of the response string.
+//                                Log.d("thisfckingtag","Response is: "+ response.substring(0,500));
+//                            }
+//                        }, new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.d("ds","That didn't work!");
+//                    }
+//                });
+                URL url = new URL("http://192.168.0.20:8000/getaccount");
+                HttpURLConnection myConnection =
+                        (HttpURLConnection) url.openConnection();
+                myConnection.setRequestProperty("Content-type","application/json");
+                myConnection.setRequestMethod("POST");
+                myConnection.setDoInput(true);
+                myConnection.setDoOutput(true);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("cd","0x5f4B72ca6740532210f9a7BEA162825099138372");
+                Log.d("json",jsonObject.toString());
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(myConnection.getOutputStream()));
+                writer.write(jsonObject.toString());
+                writer.flush();
+                myConnection.connect();
+
+                if(myConnection.getResponseCode()==200){
+                    Log.d("isucces","yes"+String.valueOf(myConnection.getResponseCode()));
+                }
+                else{
+                    Log.d("isucces","no"+String.valueOf(myConnection.getResponseCode()));
+                }
+                InputStream responseBody = myConnection.getInputStream();
+
+                InputStreamReader responseBodyReader =
+                        new InputStreamReader(responseBody);
+                JsonReader jsonReader = new JsonReader(responseBodyReader);
+                jsonReader.beginObject();
+                while (jsonReader.hasNext()){
+
+                }
+
+//                String line;
+//                String response="";
+//                BufferedReader br=new BufferedReader(new InputStreamReader(myConnection.getInputStream()));
+//                while ((line=br.readLine()) != null) {
+//                    response+=line;
+//                }
+
+//                Log.d("trythisshiit",response);
+
+
+            }catch (Exception e){
+                Log.d("isucces",e.toString());
+
+            }
+
+        }
+    };
 
 
 }

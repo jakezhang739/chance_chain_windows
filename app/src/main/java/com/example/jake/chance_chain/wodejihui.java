@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
@@ -203,6 +204,8 @@ public class wodejihui extends AppCompatActivity {
         GridView mGridview;
         CardView cardView;
         Button confirmBtn,cancelBtn;
+        Spinner invis = (Spinner) layout1.findViewById(R.id.select);
+        invis.setVisibility(View.INVISIBLE);
         mTxt=(TextView) layout1.findViewById(R.id.neirongTxt);
         uImg=(ImageView) layout1.findViewById(R.id.touxiangImg);
         uidTxt=(TextView) layout1.findViewById(R.id.userNameText);
