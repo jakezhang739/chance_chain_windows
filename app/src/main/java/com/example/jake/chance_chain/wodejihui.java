@@ -228,6 +228,7 @@ public class wodejihui extends AppCompatActivity {
             confirmBtn.setVisibility(View.INVISIBLE);
             cancelBtn.setVisibility(View.INVISIBLE);
         }
+
         if(!cList.unConfirmList.isEmpty()){
             confirmBtn.setVisibility(View.INVISIBLE);
             cancelBtn.setVisibility(View.INVISIBLE);

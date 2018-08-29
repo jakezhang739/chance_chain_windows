@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.squareup.picasso.Picasso;
@@ -362,7 +363,7 @@ public class fabuActivity extends AppCompatActivity {
         Log.d("fabuactivityywc",cList.completeList.toString());
 
         selUsr.setAdapter(adapter);
-        //selUsr.setPrompt(cList.completeList.get(0).toString());
+        //zselUsr.setPrompt(cList.completeList.get(0).toString());
         mTxt.setText(cList.txtTitle);
         uidTxt.setText(cList.userid);
         String display = displayTime(String.valueOf((long) cList.uploadTime));
@@ -490,6 +491,12 @@ public class fabuActivity extends AppCompatActivity {
 
             }
             List<String> temp = new ArrayList<>();
+            if(myUser.getLastComfirm()==null){
+                myUser.setLastComfirm("true");
+            }
+            if(hisUser.getLastComfirm()==null){
+                hisUser.setLastComfirm("true");
+            }
             if(chanceWithValueDO.getConfirmList()!=null){
                 temp=chanceWithValueDO.getConfirmList();
             }
@@ -498,6 +505,14 @@ public class fabuActivity extends AppCompatActivity {
             mapper.save(myUser);
             mapper.save(hisUser);
             mapper.save(chanceWithValueDO);
+        }
+    };
+
+    Handler confHand = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            Toast.makeText(context,"首次交易，奖励Candy100个",Toast.LENGTH_LONG).show();
+
         }
     };
 

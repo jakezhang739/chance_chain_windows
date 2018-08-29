@@ -284,8 +284,10 @@ public class ContentActivity extends AppCompatActivity {
                     } else {
                         uGetList = new ArrayList<>();
                     }
-                    if(userPoolDO.getLastGet()==null){
+                    if(userPoolDO.getLastGet()!=null){
                         msg.what=6;
+                        userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency()+100);
+                        userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet()+100);
                         userPoolDO.setLastGet(dateString);
                     }
                     else{
@@ -345,10 +347,7 @@ public class ContentActivity extends AppCompatActivity {
 
             }
             else if(msg.what==6){
-
-            }
-            else if(msg.what==7){
-
+                Toast.makeText(getApplicationContext().getApplicationContext(),"首次get，奖励Candy100个",Toast.LENGTH_LONG).show();
             }
 
 

@@ -172,6 +172,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         uriList = new ArrayList<Uri>();
         username=helper.getCurrentUserName(context);
+        new Thread(LoginRunnable).start();
         //new Thread(httpRun).start();
 
 
@@ -683,16 +684,18 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
                 List<String> idList;
                 if (userPoolDO.getChanceIdList() == null) {
                     idList = new ArrayList<>();
-                    msg.what=3;
-                    uploadHandler.sendMessage(msg);
+                    Message msg1 = new Message();
+                    msg1.what=3;
+                    uploadHandler.sendMessage(msg1);
                     userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet()+100);
                     userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency()+100);
 
                 } else {
                     idList = userPoolDO.getChanceIdList();
                     if(sameDay(userPoolDO.getLastFabu())>0){
-                        msg.what=4;
-                        uploadHandler.sendMessage(msg);
+                        Message msg1 = new Message();
+                        msg1.what=4;
+                        uploadHandler.sendMessage(msg1);
                         userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet()+10);
                         userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency()+10);
                     }
