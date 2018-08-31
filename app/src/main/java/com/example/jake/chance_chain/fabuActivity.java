@@ -48,7 +48,7 @@ public class fabuActivity extends AppCompatActivity {
     List<chanceClass> yiWanCheng = new ArrayList<>();
     int flag=1;
     LinearLayout upLayout,taglayout,beijing;
-    String tempName,tempCid,selectedUser;
+    String tempName;
     ProgressBar progressBar;
     Map<String,List<String>> userMap = new HashMap<>();
 
@@ -256,12 +256,24 @@ public class fabuActivity extends AppCompatActivity {
         selUsr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedUser = parent.getItemAtPosition(position).toString();
-                if(cList.unConfirmList.contains(selectedUser)){
-                    Log.d("fabuactivityselect",selectedUser);
-                    cancelBtn.setVisibility(View.INVISIBLE);
-                    unconfTxt.setVisibility(View.VISIBLE);
-                }
+                final String selectedUser = parent.getItemAtPosition(position).toString();
+                final String tempCid = cList.cId;
+                cancelBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+//                beijing.removeView(layout1);
+//                jinXingZhong.remove(position);
+//                weiJingxin.add(cList);
+                        cList.gottenId.remove(selectedUser);
+                        adapter.remove(selectedUser);
+                        selUsr.setAdapter(adapter);
+                        Log.d("fabuactivityjinxing",selectedUser);
+                        onForfeit cancel = new onForfeit(selectedUser,tempCid);
+                        new Thread(cancel).start();
+                        confirmBtn.setVisibility(View.INVISIBLE);
+                        cancelBtn.setVisibility(View.INVISIBLE);
+                    }
+                });
             }
 
             @Override
@@ -316,21 +328,6 @@ public class fabuActivity extends AppCompatActivity {
         });
         beijing.addView(layout1);
 
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                beijing.removeView(layout1);
-//                jinXingZhong.remove(i);
-//                weiJingxin.add(cList);
-                tempCid = cList.cId;
-                cList.unConfirmList.add(selectedUser);
-                Log.d("fabuactivityjinxing",selectedUser);
-                new Thread(onCancel).start();
-                confirmBtn.setVisibility(View.INVISIBLE);
-                cancelBtn.setVisibility(View.INVISIBLE);
-                unconfTxt.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
 
@@ -371,7 +368,9 @@ public class fabuActivity extends AppCompatActivity {
         selUsr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedUser = parent.getItemAtPosition(position).toString();
+                final String selectedUser = parent.getItemAtPosition(position).toString();
+                final String tempCid = cList.cId;
+                Log.d("selectedUser",selectedUser);
                 if(cList.confirmList.contains(selectedUser)){
                     confirmBtn.setVisibility(View.INVISIBLE);
                     cancelBtn.setVisibility(View.INVISIBLE);
@@ -382,6 +381,37 @@ public class fabuActivity extends AppCompatActivity {
                     cancelBtn.setVisibility(View.INVISIBLE);
                     unconfTxt.setVisibility(View.VISIBLE);
                 }
+                confirmBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("selectedUser1",selectedUser);
+                        cList.confirmList.add(selectedUser);
+                        Log.d("fabuactivityywcc",selectedUser);
+                        oncConfirm confirm = new oncConfirm(selectedUser,tempCid);
+                        new Thread(confirm).start();
+                        confirmBtn.setVisibility(View.INVISIBLE);
+                        cancelBtn.setVisibility(View.INVISIBLE);
+                        confTxt.setVisibility(View.VISIBLE);
+                        //jinXingZhong.remove(i);
+                        //yiWanCheng.add(cList);
+
+                    }
+                });
+                cancelBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+//                beijing.removeView(layout1);
+//                jinXingZhong.remove(i);
+//                weiJingxin.add(cList);
+                        cList.unConfirmList.add(selectedUser);
+                        Log.d("fabuactivitqxc",selectedUser);
+                        onCancel cancel = new onCancel(selectedUser,tempCid);
+                        new Thread(cancel).start();
+                        confirmBtn.setVisibility(View.INVISIBLE);
+                        cancelBtn.setVisibility(View.INVISIBLE);
+                        unconfTxt.setVisibility(View.VISIBLE);
+                    }
+                });
             }
 
             @Override
@@ -435,39 +465,14 @@ public class fabuActivity extends AppCompatActivity {
             }
         });
         beijing.addView(layout1);
-        confirmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tempCid = cList.cId;
-                cList.confirmList.add(selectedUser);
-                Log.d("fabuactivityywcc",selectedUser);
-                new Thread(oncConfirm).start();
-                confirmBtn.setVisibility(View.INVISIBLE);
-                cancelBtn.setVisibility(View.INVISIBLE);
-                confTxt.setVisibility(View.VISIBLE);
-                //jinXingZhong.remove(i);
-                //yiWanCheng.add(cList);
-
-            }
-        });
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                beijing.removeView(layout1);
-//                jinXingZhong.remove(i);
-//                weiJingxin.add(cList);
-                tempCid = cList.cId;
-                cList.unConfirmList.add(selectedUser);
-                Log.d("fabuactivitqxc",selectedUser);
-                new Thread(onCancel).start();
-                confirmBtn.setVisibility(View.INVISIBLE);
-                cancelBtn.setVisibility(View.INVISIBLE);
-                unconfTxt.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
-    Runnable oncConfirm = new Runnable() {
+    public class oncConfirm implements Runnable {
+        String selectedUser, tempCid;
+        public oncConfirm(String usr,String cid){
+            this.selectedUser = usr;
+            this.tempCid = cid;
+        }
         @Override
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
@@ -475,7 +480,7 @@ public class fabuActivity extends AppCompatActivity {
             UserPoolDO hisUser = mapper.load(UserPoolDO.class,selectedUser);
             double value;
             if(chanceWithValueDO.getFuFei()!=0.0){
-                Log.d("fufei",chanceWithValueDO.getFuFei().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
+     //           Log.d("fufei",chanceWithValueDO.getFuFei().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
                 myUser.setFrozenwallet(myUser.getFrozenwallet()-chanceWithValueDO.getFuFei());
                 myUser.setCandyCurrency(myUser.getCandyCurrency()-chanceWithValueDO.getFuFei());
                 hisUser.setAvailableWallet(hisUser.getAvailableWallet()+chanceWithValueDO.getFuFei());
@@ -483,7 +488,7 @@ public class fabuActivity extends AppCompatActivity {
 
             }
             else if(chanceWithValueDO.getShouFei()!=0.0){
-                Log.d("shoufei",chanceWithValueDO.getShouFei().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
+//                Log.d("shoufei",chanceWithValueDO.getShouFei().toString()+myUsr+chanceWithValueDO.getGetList().get(0));
                 hisUser.setFrozenwallet(hisUser.getFrozenwallet()-chanceWithValueDO.getShouFei());
                 hisUser.setCandyCurrency(hisUser.getCandyCurrency()-chanceWithValueDO.getShouFei());
                 myUser.setCandyCurrency(myUser.getCandyCurrency()+chanceWithValueDO.getShouFei());
@@ -505,8 +510,16 @@ public class fabuActivity extends AppCompatActivity {
             mapper.save(myUser);
             mapper.save(hisUser);
             mapper.save(chanceWithValueDO);
+            Message msg = new Message();
+            confHand.sendMessage(msg);
         }
     };
+
+
+
+
+
+
 
     Handler confHand = new Handler(){
         @Override
@@ -516,7 +529,12 @@ public class fabuActivity extends AppCompatActivity {
         }
     };
 
-    Runnable onCancel = new Runnable() {
+    public class onCancel implements Runnable {
+        String selectedUser,tempCid;
+        public onCancel(String usr, String cid){
+            this.selectedUser = usr;
+            this.tempCid=cid;
+        }
         @Override
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
@@ -528,6 +546,60 @@ public class fabuActivity extends AppCompatActivity {
             chanceWithValueDO.setUnConfirmList(temp);
             mapper.save(chanceWithValueDO);
 
+        }
+    };
+
+    public class onForfeit implements Runnable {
+        String selectedUser,tempCid;
+        public onForfeit(String usr, String cid){
+            this.selectedUser = usr;
+            this.tempCid=cid;
+        }
+        @Override
+        public void run() {
+            ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
+            if (chanceWithValueDO.getGetList() != null) {
+                if(chanceWithValueDO.getGetList().contains(selectedUser)) {
+                    if (chanceWithValueDO.getFuFei() != null) {
+                        UserPoolDO userPoolDO = mapper.load(UserPoolDO.class, myUsr);
+                        double frozenValue = userPoolDO.getFrozenwallet();
+                        double freeValue = chanceWithValueDO.getShouFei();
+                        userPoolDO.setFrozenwallet(frozenValue - freeValue);
+                        userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + freeValue);
+                        List<String> temp = new ArrayList<>();
+                        mapper.save(userPoolDO);
+                    } else {
+                        String hisUser = chanceWithValueDO.getUsername();
+                        UserPoolDO userPoolDO = mapper.load(UserPoolDO.class, selectedUser);
+                        double frozenValue = userPoolDO.getFrozenwallet();
+                        double freeValue = chanceWithValueDO.getShouFei();
+                        userPoolDO.setFrozenwallet(frozenValue - freeValue);
+                        userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + freeValue);
+                        List<String> temp = new ArrayList<>();
+                        temp = userPoolDO.getGottenList();
+                        mapper.save(userPoolDO);
+
+                    }
+                    UserPoolDO userPoolDO = mapper.load(UserPoolDO.class, selectedUser);
+                    List<String> temp = new ArrayList<>();
+                    temp = userPoolDO.getGottenList();
+                    temp.remove(tempCid);
+                    if (temp.size() == 0) {
+                        temp = null;
+                    }
+                    userPoolDO.setGottenList(temp);
+                    mapper.save(userPoolDO);
+                    List<String> tempList = new ArrayList<>();
+                    tempList = chanceWithValueDO.getGetList();
+                    tempList.remove(selectedUser);
+                    if(tempList.size()==0){
+                        tempList=null;
+                    }
+                    chanceWithValueDO.setGetList(tempList);
+                    mapper.save(chanceWithValueDO);
+                }
+
+            }
         }
     };
 
@@ -684,17 +756,15 @@ public class fabuActivity extends AppCompatActivity {
         }
         if(chanceWithValueDO.getCompleteList()!=null){
             cc.completeList=chanceWithValueDO.getCompleteList();
-            userMap.put(cc.cId,cc.completeList);
             yiWanCheng.add(cc);
             Log.d("fabuactivityyiwan",cc.completeList.toString());
         }
         if(chanceWithValueDO.getGetList()!=null){
-            weiJingxin.add(cc);
+            jinXingZhong.add(cc);
             Log.d("fabuactivityjinxing",cc.gottenId.toString());
 
         }
         if(chanceWithValueDO.getGetList()==null&&chanceWithValueDO.getCompleteList()==null){
-            jinXingZhong.add(cc);
             weiJingxin.add(cc);
         }
         mapper.save(chanceWithValueDO);

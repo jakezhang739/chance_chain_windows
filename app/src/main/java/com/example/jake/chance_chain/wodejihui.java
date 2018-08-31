@@ -43,8 +43,9 @@ public class wodejihui extends AppCompatActivity {
     List<chanceClass> yiWanCheng = new ArrayList<>();
     int flag=1;
     LinearLayout upLayout,taglayout,beijing;
-    String tempName,tempCid;
+    String tempCid;
     ProgressBar progressBar;
+    chanceClass tempClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +68,9 @@ public class wodejihui extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent(wodejihui.this,MyActivity.class);
+                startActivity(intent);
+
             }
         });
         TextView jinXinZhong = (TextView) findViewById(R.id.jxz);
@@ -126,13 +129,14 @@ public class wodejihui extends AppCompatActivity {
     };
 
     public void onAddView(chanceClass cList){
-        ImageView uImg,tagView,moreContent,fent;
-        TextView mTxt,uidTxt,timeTxt,dianzhan,fenxiang,pingjia,fenTitle,fenUsr;
+        View layout1 = LayoutInflater.from(this).inflate(R.layout.fabuitem, beijing, false);
+        ImageView uImg,tagView,moreContent;
+        TextView mTxt,uidTxt,timeTxt,dianzhan,fenxiang,pingjia,confTxt,unconfTxt;
         GridView mGridview;
-        RelativeLayout link;
-        ProgressBar loading;
         CardView cardView;
-        View layout1 = LayoutInflater.from(this).inflate(R.layout.item, beijing, false);
+        Button confirmBtn,cancelBtn;
+        Spinner invis = (Spinner) layout1.findViewById(R.id.select);
+        invis.setVisibility(View.INVISIBLE);
         mTxt=(TextView) layout1.findViewById(R.id.neirongTxt);
         uImg=(ImageView) layout1.findViewById(R.id.touxiangImg);
         uidTxt=(TextView) layout1.findViewById(R.id.userNameText);
@@ -140,14 +144,35 @@ public class wodejihui extends AppCompatActivity {
         tagView=(ImageView) layout1.findViewById(R.id.tagView);
         mGridview = (GridView) layout1.findViewById(R.id.gallery);
         moreContent = (ImageView) layout1.findViewById(R.id.gengduo);
+        unconfTxt = (TextView) layout1.findViewById(R.id.unConfirmtxt);
         cardView = (CardView) layout1.findViewById(R.id.card_view);
         pingjia = (TextView) layout1.findViewById(R.id.liuyan);
         fenxiang = (TextView) layout1.findViewById(R.id.fenxiang);
         dianzhan = (TextView) layout1.findViewById(R.id.dianzhan);
+        confirmBtn = (Button) layout1.findViewById(R.id.button4);
+        cancelBtn = (Button) layout1.findViewById(R.id.button5);
+        confirmBtn.setVisibility(View.INVISIBLE);
+        cancelBtn.setVisibility(View.INVISIBLE);
+        confTxt = (TextView) layout1.findViewById(R.id.confirmtxt);
+        unconfTxt = (TextView) layout1.findViewById(R.id.unConfirmtxt);
+
+        RelativeLayout selectlay = layout1.findViewById(R.id.spRel);
+        selectlay.setVisibility(View.INVISIBLE);
         mTxt.setText(cList.txtTitle);
         uidTxt.setText(cList.userid);
         String display = displayTime(String.valueOf((long) cList.uploadTime));
         timeTxt.setText(display);
+        if(cList.confirmList.contains(myUsr)){
+            confirmBtn.setVisibility(View.INVISIBLE);
+            cancelBtn.setVisibility(View.INVISIBLE);
+            confTxt.setVisibility(View.VISIBLE);
+        }
+
+        if(cList.unConfirmList.contains(myUsr)){
+            confirmBtn.setVisibility(View.INVISIBLE);
+            cancelBtn.setVisibility(View.INVISIBLE);
+            unconfTxt.setVisibility(View.VISIBLE);
+        }
         switch ((int) cList.tag) {
             case 1:
                 tagView.setImageResource(R.drawable.huodong);
@@ -194,7 +219,7 @@ public class wodejihui extends AppCompatActivity {
             }
         });
         beijing.addView(layout1);
-
+        Log.d("wodejihui",cList.userid.toString());
     }
 
     public void onAddJingXing(chanceClass cList,int i){
@@ -220,19 +245,12 @@ public class wodejihui extends AppCompatActivity {
         dianzhan = (TextView) layout1.findViewById(R.id.dianzhan);
         confirmBtn = (Button) layout1.findViewById(R.id.button4);
         cancelBtn = (Button) layout1.findViewById(R.id.button5);
+        RelativeLayout selectlay = layout1.findViewById(R.id.spRel);
+        selectlay.setVisibility(View.INVISIBLE);
         mTxt.setText(cList.txtTitle);
         uidTxt.setText(cList.userid);
         String display = displayTime(String.valueOf((long) cList.uploadTime));
         timeTxt.setText(display);
-        if(!cList.confirmList.isEmpty()){
-            confirmBtn.setVisibility(View.INVISIBLE);
-            cancelBtn.setVisibility(View.INVISIBLE);
-        }
-
-        if(!cList.unConfirmList.isEmpty()){
-            confirmBtn.setVisibility(View.INVISIBLE);
-            cancelBtn.setVisibility(View.INVISIBLE);
-        }
         switch ((int) cList.tag) {
             case 1:
                 tagView.setImageResource(R.drawable.huodong);
@@ -283,12 +301,11 @@ public class wodejihui extends AppCompatActivity {
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tempName = cList.userid;
                 tempCid = cList.cId;
                 Log.d("wodejihui",cList.userid.toString());
+                tempClass = cList;
                 new Thread(oncConfirm).start();
                 jinXingZhong.remove(i);
-                yiWanCheng.add(cList);
                 beijing.removeView(layout1);
 
 
@@ -297,32 +314,40 @@ public class wodejihui extends AppCompatActivity {
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tempName = cList.userid;
                 tempCid = cList.cId;
+                jinXingZhong.remove(i);
+                beijing.removeView(layout1);
                 Log.d("wodejihui",cList.userid.toString());
                 new Thread(onCancel).start();
-                confirmBtn.setVisibility(View.INVISIBLE);
-                cancelBtn.setVisibility(View.INVISIBLE);
-                unconfTxt.setVisibility(View.VISIBLE);
             }
         });
     }
+
 
     Runnable oncConfirm = new Runnable() {
         @Override
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
-            List<String> tempGet = chanceWithValueDO.getGetList();
-            tempGet.remove(tempName);
-            chanceWithValueDO.setGetList(tempGet);
-            List<String> temp = new ArrayList<>();
-            if(chanceWithValueDO.getCompleteList()!=null){
-                temp=chanceWithValueDO.getCompleteList();
+            if(chanceWithValueDO.getGetList()!=null){
+                if(chanceWithValueDO.getGetList().contains(myUsr)){
+                    List<String> tempGet = chanceWithValueDO.getGetList();
+                    tempGet.remove(myUsr);
+                    if(tempGet.size()==0){
+                        tempGet=null;
+                    }
+                    chanceWithValueDO.setGetList(tempGet);
+                    List<String> temp = new ArrayList<>();
+                    if(chanceWithValueDO.getCompleteList()!=null){
+                        temp=chanceWithValueDO.getCompleteList();
+                    }
+                    temp.add(myUsr);
+                    chanceWithValueDO.setCompleteList(temp);
+                    mapper.save(chanceWithValueDO);
+                    yiWanCheng.add(tempClass);
+//                    Log.d("wodejihui",chanceWithValueDO.getCompleteList().toString()+chanceWithValueDO.getGetList().toString());
+
+                }
             }
-            temp.add(tempName);
-            chanceWithValueDO.setCompleteList(temp);
-            mapper.save(chanceWithValueDO);
-            Log.d("wodejihui",chanceWithValueDO.getCompleteList().toString()+chanceWithValueDO.getGetList().toString());
         }
     };
 
@@ -330,18 +355,53 @@ public class wodejihui extends AppCompatActivity {
         @Override
         public void run() {
             ChanceWithValueDO chanceWithValueDO = mapper.load(ChanceWithValueDO.class, tempCid);
-            List<String> temp = new ArrayList<>();
-            List<String> tempGet = chanceWithValueDO.getGetList();
-            tempGet.remove(tempName);
-            chanceWithValueDO.setGetList(tempGet);
-            if(chanceWithValueDO.getUnConfirmList()!=null){
-                temp=chanceWithValueDO.getUnConfirmList();
-            }
-            temp.add(tempName);
-            chanceWithValueDO.setUnConfirmList(temp);
-            mapper.save(chanceWithValueDO);
-            Log.d("wodejihui",chanceWithValueDO.getCompleteList().toString()+chanceWithValueDO.getGetList().toString());
+            if(chanceWithValueDO.getGetList()!=null) {
+                if (chanceWithValueDO.getGetList().contains(myUsr)) {
+                    if (chanceWithValueDO.getShouFei() != null) {
+                        UserPoolDO userPoolDO = mapper.load(UserPoolDO.class, myUsr);
+                        double frozenValue = userPoolDO.getFrozenwallet();
+                        double freeValue = chanceWithValueDO.getShouFei();
+                        userPoolDO.setFrozenwallet(frozenValue - freeValue);
+                        userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + freeValue * 0.9);
+                        userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() - freeValue * 0.1);
+                        List<String> temp = new ArrayList<>();
+                        temp = userPoolDO.getGottenList();
+                        temp.remove(tempCid);
+                        if (temp.size() == 0) {
+                            temp = null;
+                        }
+                        userPoolDO.setGottenList(temp);
+                        mapper.save(userPoolDO);
+                    } else {
+                        String hisUser = chanceWithValueDO.getUsername();
+                        UserPoolDO userPoolDO = mapper.load(UserPoolDO.class, hisUser);
+                        double frozenValue = userPoolDO.getFrozenwallet();
+                        double freeValue = chanceWithValueDO.getShouFei();
+                        userPoolDO.setFrozenwallet(frozenValue - freeValue);
+                        userPoolDO.setAvailableWallet(userPoolDO.getAvailableWallet() + freeValue * 0.9);
+                        userPoolDO.setCandyCurrency(userPoolDO.getCandyCurrency() - freeValue * 0.1);
+                        List<String> temp = new ArrayList<>();
+                        temp = userPoolDO.getGottenList();
+                        temp.remove(tempCid);
+                        if (temp.size() == 0) {
+                            temp = null;
+                        }
+                        userPoolDO.setGottenList(temp);
+                        mapper.save(userPoolDO);
 
+                    }
+                    List<String> temp = new ArrayList<>();
+                    List<String> tempGet = chanceWithValueDO.getGetList();
+                    tempGet.remove(myUsr);
+                    if (tempGet.size() == 0) {
+                        chanceWithValueDO.setGetList(null);
+                    } else {
+                        chanceWithValueDO.setGetList(tempGet);
+                    }
+                    mapper.save(chanceWithValueDO);
+
+                }
+            }
         }
     };
 
@@ -476,11 +536,16 @@ public class wodejihui extends AppCompatActivity {
         if (chanceWithValueDO.getSharedFrom() != null) {
             cc.setSharfrom(chanceWithValueDO.getSharedFrom());
         }
-        if(chanceWithValueDO.getCompleteList()!=null){
-            yiWanCheng.add(cc);
+        if(chanceWithValueDO.getGetList()!=null){
+            if(chanceWithValueDO.getGetList().contains(myUsr)) {
+                jinXingZhong.add(cc);
+            }
+            else{
+                yiWanCheng.add(cc);
+            }
         }
         else {
-            jinXingZhong.add(cc);
+            yiWanCheng.add(cc);
         }
         mapper.save(chanceWithValueDO);
         Message msg = new Message();

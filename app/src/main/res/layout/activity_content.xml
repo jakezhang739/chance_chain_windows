@@ -54,39 +54,12 @@
             android:text="lk"
             />
 
-        <TextView
-            android:id="@+id/fufeiTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/contentNei"
-            android:text=""
-            android:textColor="@color/yellow"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/shoufei"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/fufeiTxt"
-            android:text=""
-            android:textColor="@color/yellow"
-            android:textSize="20sp" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:id="@+id/renshu"
-            android:layout_below="@id/shoufei"
-            android:textColor="@color/yellow"
-            android:textSize="20sp"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/imgLayout"
             android:orientation="vertical"
-            android:layout_below="@id/renshu">
+            android:layout_below="@id/contentNei">
 
         </LinearLayout>
         <TextView
@@ -96,78 +69,15 @@
             android:layout_below="@+id/imgLayout"
             android:background="@color/homeback"/>
 
-    <ImageView
-        android:id="@+id/contentFen"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/contentTou"
-        android:layout_marginEnd="16dp"
-        app:srcCompat="@drawable/zhanwaifenxiang2x" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="30dp"
-            android:id="@+id/cZhuanFa"
-            android:layout_below="@+id/spacing1"
-            android:text="转发"
-            android:textSize="20dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/zhuanfaNum"
-            android:layout_below="@+id/spacing1"
-            android:layout_toRightOf="@+id/cZhuanFa"
-            android:layout_marginLeft="5dp"
-            android:textSize="20dp"
-            android:text="0"/>
-        <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/zhuanfaNum"
-        android:layout_marginLeft="20dp"
-        android:id="@+id/cPingLun"
-        android:layout_below="@+id/spacing1"
-        android:text="评论"
-        android:textSize="20dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/pingNum"
-            android:layout_below="@+id/spacing1"
-            android:layout_toRightOf="@+id/cPingLun"
-            android:layout_marginLeft="5dp"
-            android:textSize="20dp"
-            android:text="0"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/pingNum"
-            android:layout_marginLeft="20dp"
-            android:id="@+id/cZan"
-            android:layout_below="@+id/spacing1"
-            android:text="赞"
-            android:textSize="20dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/zanNUm"
-            android:layout_below="@+id/spacing1"
-            android:layout_toRightOf="@+id/cZan"
-            android:layout_marginLeft="5dp"
-            android:textSize="20dp"
-            android:text="0"/>
 
         <Button
             android:id="@+id/getBtn"
             android:layout_width="60dp"
             android:layout_height="30dp"
-            android:layout_toRightOf="@id/zanNUm"
-            android:layout_marginLeft="80dp"
+            android:layout_alignParentEnd="true"
             android:layout_below="@+id/spacing1"
-            android:background="@color/yellow"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/round_corner"
             android:text="Get"
             android:textColor="@color/black" />
         <android.support.v7.widget.RecyclerView
@@ -178,17 +88,36 @@
         </android.support.v7.widget.RecyclerView>
 
         <TextView
-            android:id="@+id/huodeJihui"
+            android:id="@+id/jine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/spacing1"
+            android:layout_marginStart="13dp"
+            android:textColor="@color/yellow"
+            android:text="TextView" />
+
+        ]<TextView
+            android:id="@+id/renshu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spacing1"
+            android:layout_toRightOf="@+id/jine"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/yellow"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/xianzhi"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/spacing1"
-            android:background="@color/yellow"
-            android:gravity="center"
-            android:text="您已获得该机会"
+            android:layout_marginEnd="20dp"
             android:textColor="@color/black"
-            android:textSize="20sp"
-            android:visibility="invisible"/>
+            android:textSize="15sp"
+            android:background="@drawable/round_corner"
+            android:text="TextView" />
 
 
     </RelativeLayout>
@@ -229,7 +158,7 @@
         android:background="@color/homeback"
         android:orientation="horizontal">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/firstBar"
@@ -237,23 +166,25 @@
             android:layout_marginTop="7dp"
             android:layout_weight="1"
             android:clickable="true">
+
+            <TextView
+                android:id="@+id/zhuanBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="shi"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/zhanneifenxiang2x"
-                android:layout_gravity="center"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/zhuanBar"
-                android:layout_marginLeft="10dp"
-                android:text="转发"
-                android:textColor="@color/white"
-                android:textSize="20dp"
-                android:layout_gravity="center_vertical"
-                />
-        </LinearLayout>
-        <LinearLayout
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:src="@drawable/zhanneifenxiang2x" />
+        </RelativeLayout>
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/secondBar"
@@ -262,24 +193,27 @@
             android:layout_marginLeft="5dp"
             android:layout_weight="1"
             android:clickable="true">
+
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/liuyan2x"
-                android:layout_gravity="center"/>
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:src="@drawable/liuyan2x" />
+
             <TextView
+                android:id="@+id/pinBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/pinBar"
-                android:layout_marginLeft="10dp"
-                android:text="评论"
-                android:textColor="@color/white"
-                android:textSize="20dp"
+                android:layout_centerInParent="true"
                 android:layout_gravity="center_vertical"
-                />
+                android:text="shi"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
 
-        </LinearLayout>
-        <LinearLayout
+        </RelativeLayout>
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/thirdBar"
@@ -288,23 +222,36 @@
             android:background="@color/colorPrimaryDark"
             android:layout_weight="1"
             android:clickable="true">
+
             <ImageView
+                android:id="@+id/zanSpic"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/dianzan2x"
-                android:id="@+id/zanSpic"
-                android:layout_gravity="center"/>
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:src="@drawable/dianzan2x" />
+            <ImageView
+                android:id="@+id/zanSpicyellow"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:tint="@color/yellow"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:visibility="invisible"
+                android:src="@drawable/dianzan2x" />
+
             <TextView
+                android:id="@+id/zanBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/zanBar"
-                android:layout_marginLeft="10dp"
-                android:text="点赞"
-                android:textColor="@color/white"
-                android:textSize="20dp"
+                android:layout_centerInParent="true"
                 android:layout_gravity="center_vertical"
-                />
-        </LinearLayout>
+                android:text="shi"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+        </RelativeLayout>
 
     </LinearLayout>
 

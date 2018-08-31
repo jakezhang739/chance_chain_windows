@@ -43,8 +43,8 @@ import java.util.List;
 public class ContentActivity extends AppCompatActivity {
     private chanceClass chanceC;
     DynamoDBMapper dynamoDBMapper;
-    ImageView touImg,likeImg;
-    TextView uName,uTime,nText,zhuanNum,comNum,zhanNum,shouTxt,fuTxt,renshu;
+    ImageView touImg,likeImg,likeYellow;
+    TextView uName,uTime,nText,zhuanNum,comNum,zhanNum,jineTxt,fuTxt,renshu;
     List<ImageView> imgList = new ArrayList<>();
     List<String> strList = new ArrayList<>();
     List<commentClass> comClass = new ArrayList<>();
@@ -80,14 +80,13 @@ public class ContentActivity extends AppCompatActivity {
         fufei = String.valueOf(chanceC.fufei);
         stype = chanceC.sType;
         ftype = chanceC.fType;
-        shouTxt = (TextView) findViewById(R.id.shoufei);
-        fuTxt = (TextView) findViewById(R.id.fufeiTxt);
+        jineTxt = (TextView) findViewById(R.id.jine);
         renshu = (TextView) findViewById(R.id.renshu);
         if(!shoufei.equals("0")) {
-            shouTxt.setText("收费金额： " + shoufei + stype);
+            jineTxt.setText("收费金额： " + shoufei + stype);
         }
         if(!fufei.equals("0")) {
-            fuTxt.setText("付费金额： " + fufei + ftype);
+            jineTxt.setText("付费金额： " + fufei + ftype);
         }
         int rNum = (int) chanceC.renshu;
         renshu.setText("还剩"+String.valueOf(rNum)+"人能获得该机会");
@@ -96,15 +95,17 @@ public class ContentActivity extends AppCompatActivity {
         uTime = (TextView) findViewById(R.id.contentTime);
         nText = (TextView) findViewById(R.id.contentNei);
         likeImg = (ImageView) findViewById(R.id.zanSpic);
-        zhuanNum = (TextView) findViewById(R.id.zhuanfaNum);
-        comNum = (TextView) findViewById(R.id.pingNum);
-        zhanNum = (TextView) findViewById(R.id.zanNUm);
+        likeYellow = (ImageView) findViewById(R.id.zanSpicyellow);
+        zhuanNum = (TextView) findViewById(R.id.zhuanBar);
+        comNum = (TextView) findViewById(R.id.pinBar);
+        zhanNum = (TextView) findViewById(R.id.zanBar);
         if(chanceC.liked.contains(curUsername)) {
-            likeImg.setBackgroundColor(getColor(R.color.yellow));
-
+            likeImg.setVisibility(View.INVISIBLE);
+            likeYellow.setVisibility(View.VISIBLE);
         }
         else{
-            likeImg.setBackgroundColor(getColor(R.color.colorPrimaryDark));
+            likeImg.setVisibility(View.VISIBLE);
+            likeYellow.setVisibility(View.INVISIBLE);
         }
 
         if(!chanceC.touUri.isEmpty()){
@@ -130,7 +131,6 @@ public class ContentActivity extends AppCompatActivity {
             imgLay.addView(spaceImg);
         }
 
-        ImageView dianPic = (ImageView) findViewById(R.id.zanSpic);
 
         zhuanNum.setText(String.valueOf(shareNum));
         comNum.setText(String.valueOf(liuNum));
@@ -175,14 +175,16 @@ public class ContentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(chanceC.liked.contains(curUsername)) {
-                    likeImg.setBackgroundColor(getColor(R.color.colorPrimaryDark));
+                    likeImg.setVisibility(View.VISIBLE);
+                    likeYellow.setVisibility(View.INVISIBLE);
                     chanceC.deleteLike(curUsername);
                     likeNum--;
                     zhanNum.setText(String.valueOf(likeNum));
 
                 }
                 else{
-                    likeImg.setBackgroundColor(getColor(R.color.yellow));
+                    likeImg.setVisibility(View.INVISIBLE);
+                    likeYellow.setVisibility(View.VISIBLE);
                     chanceC.addLiked(curUsername);
                     likeNum++;
                     zhanNum.setText(String.valueOf(likeNum));
@@ -212,15 +214,16 @@ public class ContentActivity extends AppCompatActivity {
         popupWindow.setHeight(RelativeLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.setContentView(LayoutInflater.from(this).inflate(R.layout.popupwindow,null));
         rootview = LayoutInflater.from(ContentActivity.this).inflate(R.layout.activity_content, null);
-        showText = (TextView) findViewById(R.id.huodeJihui);
+        showText = (TextView) findViewById(R.id.xianzhi);
 
         if(chanceC.gottenId.contains(curUsername)){
             getButton.setVisibility(View.INVISIBLE);
+            showText.setText("您已获得该机会");
             showText.setVisibility(View.VISIBLE);
         }
         else if(chanceC.renshu<1){
             getButton.setVisibility(View.INVISIBLE);
-            showText.setText("该机会已达到获得人数上限");
+            showText.setText("机会已被拿完");
             showText.setVisibility(View.VISIBLE);
         }
         else {
