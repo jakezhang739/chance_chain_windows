@@ -137,9 +137,9 @@ public class ContentActivity extends AppCompatActivity {
         zhanNum.setText(String.valueOf(likeNum));
 
 
-        LinearLayout fLay = (LinearLayout) findViewById(R.id.firstBar);
-        LinearLayout sLay = (LinearLayout) findViewById(R.id.secondBar);
-        LinearLayout tLay = (LinearLayout) findViewById(R.id.thirdBar);
+        RelativeLayout fLay = (RelativeLayout) findViewById(R.id.firstBar);
+        RelativeLayout sLay = (RelativeLayout) findViewById(R.id.secondBar);
+        RelativeLayout tLay = (RelativeLayout) findViewById(R.id.thirdBar);
         LinearLayout comLayout = (LinearLayout) findViewById(R.id.liulay);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.cRecycle);

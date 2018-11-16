@@ -72,7 +72,7 @@
 
             <GridView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:id="@+id/gallery"
                 android:numColumns="4"
                 android:verticalSpacing="5dp"
@@ -121,7 +121,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_toEndOf="@+id/imageView2"
                 android:gravity="left"
-                android:textSize="15sp"
+                android:textSize="20sp"
                 android:text="0" />
 
 
@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_toEndOf="@+id/imageView9"
-            android:textSize="15sp"
+            android:textSize="20sp"
             android:text="0" />
 
         <ImageView
@@ -150,6 +150,16 @@
             android:gravity="right"
             android:layout_toStartOf="@+id/dianzhan"
             app:srcCompat="@drawable/dianzan2x" />
+        <ImageView
+            android:id="@+id/imageView11"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:tint="@color/yellow"
+            android:gravity="right"
+            android:visibility="invisible"
+            android:layout_toStartOf="@+id/dianzhan"
+            app:srcCompat="@drawable/dianzan2x" />
 
         <TextView
             android:id="@+id/dianzhan"
@@ -158,7 +168,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="18dp"
-            android:textSize="15sp"
+            android:textSize="20sp"
             android:text="0" />
     </RelativeLayout>
 

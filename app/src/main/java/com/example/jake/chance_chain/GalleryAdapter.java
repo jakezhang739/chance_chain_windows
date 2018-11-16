@@ -190,6 +190,7 @@ public class GalleryAdapter extends
                 public void onClick(View v) {
                         Intent intent = new Intent(v.getContext(), ContentActivity.class);
                         intent.putExtra("cc", cList.get(i));
+                        intent.putExtra("comment","false");
                         v.getContext().startActivity(intent);
 
                 }
@@ -270,6 +271,7 @@ public class GalleryAdapter extends
           Intent intent = new Intent(mContext,ContentActivity.class);
           chanceClass cc = (chanceClass) msg.getData().getParcelable("share");
           intent.putExtra("cc",cc);
+          intent.putExtra("comment","false");
           mContext.startActivity(intent);
       }
       }

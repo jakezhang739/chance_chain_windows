@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Chance_chain</string>
+    <string name="app_name">机会链</string>
     <string name="title_activity_authenticator">Chance</string>
     <string name="title_home">机会首页</string>
     <string name="title_dashboard">我的</string>
@@ -19,17 +19,24 @@
     <string name="Username">Username</string>
     <string name="Password">Password</string>
     <string name="Menu">Menu</string>
-    <string name="pick_MFA">MFA Options</string>
-    <string name="title_activity_sign_up_confirm">SignUpConfirm</string>
-    <string name="title_activity_mfa">MFAActivity</string>
-    <string name="title_activity_choose_mfa">ChooseMFA</string>
-    <string name="title_activity_forgot_password">ForgotPasswordActivity</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-    <string name="title_activity_change_password">ChangePasswordActivity</string>
-    <string name="title_activity_verify">VerifyActivity</string>
-    <string name="title_activity_add_attribute">AddAttributeActivity</string>
-    <string name="title_activity_device_settings">DeviceSettings</string>
-    <string name="title_activity_new_password">NewPassword</string>
+    <string name="uploadTou">上传头像文件</string>
+    <string name="takePic">拍照头像文件</string>
+    <string name="nickname">昵称</string>
+    <string name="name">姓名</string>
+    <string name="chanceId">机会号</string>
+    <string name="walletAddress">钱包地址</string>
+    <string name="gender">性别</string>
+    <string name="career">职业</string>
+    <string name="resuem">个人简介</string>
+    <string name="finish">完成</string>
+    <string name="confirmAccount">确认您的帐号</string>
+    <string name="enterAccount">请输入你的用户名和我们向您提供的验证码以完成注册</string>
+    <string name="userName">用户名</string>
+    <string name="verCode">验证码</string>
+    <string name="finishRegister">完成注册</string>
+
+
+
 
     <string-array name="currency_name">
         <item>cc</item>
@@ -37,8 +44,6 @@
         <item>btc</item>
     </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
